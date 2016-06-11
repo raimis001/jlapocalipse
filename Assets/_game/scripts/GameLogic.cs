@@ -11,25 +11,28 @@ public class GameLogic : MonoBehaviour
 		get { return _instance; }
 	}
 
-
 	public static Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
 	public static List<Build> Places = new List<Build>();
 
+	public static GameObject Device(RoomType type)
+	{
+		return Instance.DevicesPrefab[(int)type];
+	}
 
 	public static void CreateRoom(RoomPosition pos)
 	{
 		Room room = Room.CreateRoom(pos, RoomType.SERVICE);
 
 		int weight = 0;
-		if (Rooms.ContainsKey(RoomPosition.Hash(pos.x - 1, pos.y)))
+		if (pos.HasLeft())
 		{
 			weight += 1;
-			Rooms[RoomPosition.Hash(pos.x - 1, pos.y)].Weight += 2;
+			pos.LeftRoom.Weight += 2;
 		}
-		if (Rooms.ContainsKey(RoomPosition.Hash(pos.x + 1, pos.y)))
+		if (pos.HasRight())
 		{
 			weight += 2;
-			Rooms[RoomPosition.Hash(pos.x + 1, pos.y)].Weight += 1;
+			pos.RightRoom.Weight += 1;
 		}
 
 		room.Weight = weight;
@@ -61,6 +64,8 @@ public class GameLogic : MonoBehaviour
 				if (!value || _selectedRoom.Position.ToString().Equals(value.Position.ToString()))
 				{
 					_selectedRoom = null;
+					Instance.BuildMenu.SetActive(true);
+					Instance.RoomMenu.SetActive(false);
 					return;
 				}
 			}
@@ -70,6 +75,8 @@ public class GameLogic : MonoBehaviour
 			{
 				_selectedRoom.Selected = true;
 			}
+			Instance.BuildMenu.SetActive(!_selectedRoom);
+			Instance.RoomMenu.SetActive(_selectedRoom);
 		}
 	}
 
@@ -77,24 +84,28 @@ public class GameLogic : MonoBehaviour
 	public GameObject RoomPrefab;
 	public GameObject BuildPrefab;
 
+	public GameObject[] DevicesPrefab;
+
+	[Header("Interface")]
+	public GameObject BuildMenu;
+	public GameObject RoomMenu;
+
 	void Awake()
 	{
 		_instance = this;
 	}
 
-	// Use this for initialization
 	void Start()
 	{
 		CreateRoom(new RoomPosition());
+		BuildMenu.SetActive(true);
+		RoomMenu.SetActive(false);
 	}
 
-	// Update is called once per frame
 	void Update()
 	{
-
+		Cave.Update();
 	}
-
-	
 
 	public void StartBuild()
 	{
@@ -119,4 +130,19 @@ public class GameLogic : MonoBehaviour
 
 	}
 
+	public void MakeDevice(int type)
+	{
+		if (!_selectedRoom) return;
+
+		_selectedRoom.Type = (RoomType)type;
+
+	}
+
+	public static IEnumerable<RoomProperty> Properties()
+	{
+		foreach (Room room in Rooms.Values)
+		{
+			yield return room.Position.Property;
+		}
+	}
 }

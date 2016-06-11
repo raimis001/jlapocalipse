@@ -8,6 +8,7 @@ public class CameraManager : MonoBehaviour
 	public float verticalScrollSpeed = 1;
 	public float zoomSpeed = 1;
 
+	Vector3 _dragg;
 	// Use this for initialization
 	void Start()
 	{
@@ -17,6 +18,20 @@ public class CameraManager : MonoBehaviour
 	// Update is called once per frame
 	private void Update()
 	{
+		if (Input.GetMouseButtonDown(2))
+		{
+			_dragg = Input.mousePosition;
+			return;
+		}
+
+		if (Input.GetMouseButton(2))
+		{
+			Vector3 delta = (_dragg - Input.mousePosition) * 0.3f;
+			MoveMe(delta.x, delta.y, 0);
+			_dragg = Input.mousePosition;
+			return;
+		}
+
 		float xAxisValue = Input.GetAxis("Horizontal");
 		float yAxisValue = Input.GetAxis("Vertical");
 		float zMove = Input.GetAxis("Mouse ScrollWheel");

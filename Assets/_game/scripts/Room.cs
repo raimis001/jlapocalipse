@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 [ExecuteInEditMode]
 public class Room : MonoBehaviour
@@ -9,13 +10,28 @@ public class Room : MonoBehaviour
 	public GameObject[] Walls;
 
 	private int _weight;
-
-	[Range(0,3)]
+	[Range(0, 3)]
 	public int Weight;
 
-	[HideInInspector]
-	public RoomType Type;
+	public RoomDevice Device;
 
+	private RoomType _type;
+	public RoomType Type {
+		get { return _type; }
+		set {
+			_type = value;
+
+			Position.Property = new RoomProperty() { RoomType = _type };
+
+			if (Device)
+			{
+				Destroy(Device.gameObject);
+			}
+		
+			Device = RoomDevice.Create(_type, transform, Position);
+		}
+	}
+	
 	public RoomPosition Position = new RoomPosition();
 
 	private bool _selected;
@@ -99,6 +115,8 @@ public class Room : MonoBehaviour
 
 	void OnMouseUp()
 	{
+		if (EventSystem.current.IsPointerOverGameObject()) return;
+
 		GameLogic.SelectedRoom = this;
 	}
 

@@ -169,12 +169,12 @@ public class iTweenEvent : MonoBehaviour{
 	[SerializeField]
 	ArrayIndexes[] transformArrays;
 	
-	[SerializeField]
-	iTweenPath[] paths;
+	//[SerializeField]
+	//iTweenPath[] paths;
 	
 	Dictionary<string, object> values;
 	bool stopped;
-	iTween instantiatedTween;
+	//iTween instantiatedTween;
 	string internalName;
 	
 	public void Start() {
