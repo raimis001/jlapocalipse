@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class GameLogic : MonoBehaviour
@@ -90,6 +91,9 @@ public class GameLogic : MonoBehaviour
 	public GameObject BuildMenu;
 	public GameObject RoomMenu;
 
+	[Header("Test")]
+	public Text OxigeGen;
+
 	void Awake()
 	{
 		_instance = this;
@@ -105,6 +109,7 @@ public class GameLogic : MonoBehaviour
 	void Update()
 	{
 		Cave.Update();
+		OxigeGen.text = Cave.Storage.Oxigen.ToString();
 	}
 
 	public void StartBuild()

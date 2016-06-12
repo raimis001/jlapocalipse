@@ -7,20 +7,32 @@ public class Progress3D : MonoBehaviour
 	public Transform Bar;
 
 	[Range(0, 1f)]
-	public float Value;
+	public float Test;
+
+	public float Value
+	{
+		set
+		{
+			float val = Mathf.Clamp(value, 0f, 1f);
+			if (Bar)
+			{
+				Bar.localScale = new Vector3(Bar.localScale.x, val, Bar.localScale.z);
+				Bar.localPosition = new Vector3(Bar.localPosition.x, val - 1f, Bar.localPosition.z);
+			}
+		}
+	}
 
 	void Start()
 	{
-		Bar.localScale = new Vector3(Bar.localScale.x, Value, Bar.localScale.z);
-		Bar.localPosition = new Vector3(Bar.localPosition.x, Value - 1f, Bar.localPosition.z);
+		Value = 0;
 	}
 
 	void Update()
 	{
-		if (Bar)
+		if (!Application.isPlaying)
 		{
-			Bar.localScale = new Vector3(Bar.localScale.x, Value, Bar.localScale.z);
-			Bar.localPosition = new Vector3(Bar.localPosition.x, Value - 1f, Bar.localPosition.z);
+			Value = Test;
 		}
 	}
+
 }

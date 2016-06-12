@@ -17,20 +17,22 @@ public class RoomDevice : MonoBehaviour
 	}
 
 	public RoomPosition Room;
-
-	public Progress3D Damage;
-	public Progress3D Output;
-
-	public Progress3D OxigenStorage;
-
-
 	public Light Power;
 
-	void Update()
-	{
-		if (OxigenStorage)
-		{
-			OxigenStorage.Value = Room.Property.Storage.Oxigen;
-		} 
+
+	private bool _lightsOn = true;
+	public bool LightsOn {
+		get { return _lightsOn; }
+		set {
+			if (_lightsOn == value) return;
+
+			_lightsOn = value;
+			if (Power)
+			{
+				Power.gameObject.SetActive(_lightsOn);
+			}
+		}
 	}
+
 }
+

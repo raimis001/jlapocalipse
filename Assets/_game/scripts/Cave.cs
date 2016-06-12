@@ -9,34 +9,55 @@ public enum RoomType
 	LIVING = 1,
 	ENERGY = 2,
 	OXIGEN = 3,
+	MEAL = 4,
 }
 
 public struct P
 {
-	public float value;
-	public float Value(int level)
+	private float value;
+
+	private P(float val)
 	{
-		return value * (float)level;
+		this.value = val;// Mathf.Clamp(val,0f,1f);
 	}
 
-	public P(float value)
+	public void Clamp(float val)
 	{
-		this.value = value;
+		this.value = Mathf.Clamp(val,0f,1f);
+	}
+	public void ClampA(float val)
+	{
+		this.value = Mathf.Clamp(this.value + val, 0f, 1f);
+	}
+
+	public float Level(int level)
+	{
+		return this.value*(float) level;
+	}
+
+	public override string ToString()
+	{
+		return value.ToString("0.00");
 	}
 
 	public static implicit operator P(float v)
 	{
 		return new P(v);
 	}
+	public static implicit operator float(P record)
+	{
+		return record.value;
+	}
+
 }
 
 public struct PropertySetup
 {
-	public float Energy;
-	public float Oxigen;
-	public float Temperature;
-	public float Water;
-	public float Meal;
+	public P Energy;
+	public P Oxigen;
+	public P Temperature;
+	public P Water;
+	public P Meal;
 }
 
 public struct RoomSetup
@@ -56,8 +77,12 @@ public struct Property
 {
 	public int level;
 	public PropertySetup setup;
-	public float Energy { get { return level * setup.Energy; } }
-	public float Oxigen { get { return level * setup.Oxigen; } }
+
+	public float Energy { get { return setup.Energy.Level(level); } }
+	public float Oxigen { get { return setup.Oxigen.Level(level); } }
+	public float Temperature { get { return setup.Temperature.Level(level); } }
+	public float Water { get { return setup.Water.Level(level); } }
+	public float Meal { get { return setup.Meal.Level(level); } }
 }
 
 public class RoomProperty
@@ -65,36 +90,34 @@ public class RoomProperty
 	public RoomType RoomType;
 	public float Live;
 	public int Level = 1;
+	public float Damage = 0;
+	private Property _use;
+	private Property _gen;
 
 	public PropertySetup Storage = new PropertySetup()
 	{
-		Energy = 1f,
+		Energy = 0f,
 		Oxigen = 1f,
 		Temperature = 1f,
 		Water = 0,
-		Meal = 0
+		Meal = 0,
 	};
 
 	public Property Use
 	{
-		get {
-			Property p = new Property()
-			{
-				setup = Setup.Use,
-				level = Level
-			};
-			return p;
+		get
+		{
+			_use.setup = Setup.Use;
+			_use.level = Level;
+			return _use;
 		}
 	}
 
 	public Property Gen {
 		get {
-			Property p = new Property()
-			{
-				setup = Setup.Gen,
-				level = Level
-			};
-			return p;
+			_gen.setup = Setup.Gen;
+			_gen.level = Level;
+			return _gen;
 		}
 	}
 	public RoomSetup Setup {
@@ -176,9 +199,9 @@ public static class  Cave
 				Name = "Telpa",
 				Description = "Šo isatbu var pārbūvēt par kādu nepieciešamu istabu",
 				Use =  {					
-					Energy = 1f,
-					Oxigen = -1,
-					Temperature = -2,
+					Energy = 1,
+					Oxigen = 1,
+					Temperature = 2,
 					Water = 0,
 					Meal = 0
 				},
@@ -197,14 +220,14 @@ public static class  Cave
 				Name = "Ģenerātors",
 				Description = "Ģenerators ražo elektrību, kas nepieciešama citām iekārtām",
 				Use = {
-					Energy = -1,
-					Oxigen = -1,
-					Temperature = -2,
+					Energy = 1,
+					Oxigen = 5,
+					Temperature = 2,
 					Water = 0,
 					Meal = 0
 				},
 				Gen = {
-					Energy = 0,
+					Energy = 10,
 					Oxigen = 0,
 					Temperature = 0,
 					Water = 0,
@@ -218,15 +241,15 @@ public static class  Cave
 				Name = "Gaisa filtrs",
 				Description = "Filtrs attīra gaisu un padara to derīgu elpošanai.",
 				Use = {
-					Energy = -1,
-					Oxigen = -1,
-					Temperature = -2,
+					Energy = 5,
+					Oxigen = 1,
+					Temperature = 2,
 					Water = 0,
 					Meal = 0
 				},
 				Gen = {
 					Energy = 0,
-					Oxigen = 5,
+					Oxigen = 10,
 					Temperature = 0,
 					Water = 0,
 					Meal = 0
@@ -239,11 +262,11 @@ public static class  Cave
 				Name = "Dzīvojamā istaba",
 				Description = "Te var atpūsties un sakrāt spēkus nākamajai dienai.",
 				Use = {
-					Energy = -1,
-					Oxigen = -1,
-					Temperature = -2,
+					Energy = 3,
+					Oxigen = 3,
+					Temperature = 2,
 					Water = 0,
-					Meal = 0
+					Meal = 0,
 				},
 				Gen =  {
 					Energy = 0,
@@ -253,34 +276,65 @@ public static class  Cave
 					Meal = 0
 				}
 			}
-		}
+		},
+		{RoomType.MEAL, new RoomSetup()
+			{
+				Type = RoomType.MEAL,
+				Name = "Ēdiens",
+				Description = "Ēdiens ir svarīga lieta enerģijas iegūšanai.",
+				Use = {
+					Energy = 4,
+					Oxigen = 2,
+					Temperature = 2,
+					Water = 0,
+					Meal = 0,
+				},
+				Gen =  {
+					Energy = 0,
+					Oxigen = 0,
+					Temperature = 0,
+					Water = 0,
+					Meal = 10
+				}
+			}
+		},
 	};
 	#endregion
 
-	public static float Energy;
-	public static float Oxigen;
-	public static float Temperature;
-	public static float Water;
-	public static float Meal;
+	public static PropertySetup Storage = new PropertySetup()
+	{
+		Energy = 0,
+		Oxigen = 1,
+		Temperature = 1,
+		Water = 0,
+		Meal = 0
+	};
 
 	public static void Update()
 	{
-		float oxigen = 0;
+
+		float oxigenUse = 0;
+		float oxigenGen = 0;
+
+		float energyUse = 0;
+		float energyGen = 0;
+
 		foreach (RoomProperty p in GameLogic.Properties())
 		{
-			//RoomProperty p = room.Position.Property;
-			p.Storage.Oxigen += p.Use.Oxigen * Time.deltaTime * 0.01f;
-			p.Storage.Oxigen = Mathf.Clamp(p.Storage.Oxigen, 0, 1);
+			Property use = p.Use;
+			Property gen = p.Gen;
 
-			oxigen += p.Gen.Oxigen * Time.deltaTime;
-		}
-		foreach (RoomProperty p in GameLogic.Properties())
-		{
-			if (oxigen <= 0) break;
-			oxigen -= 0.02f;
-			p.Storage.Oxigen += Time.deltaTime * 0.02f;
-			p.Storage.Oxigen = Mathf.Clamp(p.Storage.Oxigen, 0, 1);
+			oxigenUse += use.Oxigen;
+			oxigenGen += gen.Oxigen;
 
+			energyUse += use.Energy;
+			energyGen += gen.Energy;
+	
 		}
+
+		Storage.Energy.Clamp(energyUse > 0 ? energyGen / energyUse : 1f);
+		Storage.Oxigen.ClampA((oxigenGen * Storage.Energy - oxigenUse) * Time.deltaTime * 0.01f);
+
+		//Debug.Log("gen:" + energyGen + " use:" + energyUse + " energy:" + Storage.Energy);
 	}
 }

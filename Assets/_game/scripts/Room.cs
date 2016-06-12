@@ -2,7 +2,6 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 
-[ExecuteInEditMode]
 public class Room : MonoBehaviour
 {
 
@@ -13,6 +12,15 @@ public class Room : MonoBehaviour
 	[Range(0, 3)]
 	public int Weight;
 
+	public GameObject Lights;
+
+	[Header("Indicators")]
+	public Progress3D DamageProgress;
+	public Progress3D EnergyStorage;
+	public Progress3D OxigenStorage;
+	public Progress3D TemperatureStorage;
+
+	[HideInInspector]
 	public RoomDevice Device;
 
 	private RoomType _type;
@@ -29,10 +37,30 @@ public class Room : MonoBehaviour
 			}
 		
 			Device = RoomDevice.Create(_type, transform, Position);
+			Device.LightsOn = _lightsOn;
 		}
 	}
-	
-	public RoomPosition Position = new RoomPosition();
+
+	private bool _lightsOn = true;
+	public bool LightsOn
+	{
+		get { return _lightsOn; }
+		set
+		{
+			//if (_lightsOn == value) return;
+
+			_lightsOn = value;
+			if (Lights)
+			{
+				Lights.SetActive(_lightsOn);
+			}
+			if (Device)
+			{
+				Device.LightsOn = _lightsOn;
+			}
+
+		}
+	}
 
 	private bool _selected;
 	public bool Selected
@@ -45,11 +73,12 @@ public class Room : MonoBehaviour
 		}
 	}
 
+	public RoomPosition Position = new RoomPosition();
+
 	public static Room CreateRoom(RoomPosition pos, RoomType type)
 	{
 		return CreateRoom(pos.x, pos.y, type);
 	}
-
 	public static Room CreateRoom(int x, int y, RoomType type)
 	{
 		GameObject obj = Instantiate(GameLogic.Instance.RoomPrefab);
@@ -79,6 +108,17 @@ public class Room : MonoBehaviour
 			_weight = Weight;
 			SetWalls();
 		}
+		if (Position == null) return;
+
+		RoomProperty p = Position.Property;
+		if (p == null) return; 
+
+		if (DamageProgress) DamageProgress.Value = p.Damage;
+		if (EnergyStorage) EnergyStorage.Value = Cave.Storage.Energy;
+		if (OxigenStorage) OxigenStorage.Value = Cave.Storage.Oxigen;
+
+		LightsOn = p.Use.Energy <= 1 ? Cave.Storage.Energy > 0.9f : Cave.Storage.Energy >= 0.5f;
+
 	}
 
 	void SetWalls()

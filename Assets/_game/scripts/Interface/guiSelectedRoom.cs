@@ -17,7 +17,6 @@ public class guiSelectedRoom : MonoBehaviour
 
 	void OnEnable()
 	{
-		Debug.Log("Set select room");
 		DisableAll();
 		if (!GameLogic.SelectedRoom) return;
 
@@ -26,6 +25,6 @@ public class guiSelectedRoom : MonoBehaviour
 
 	void OnDisable()
 	{
-		Debug.Log("Disable selected");
+		//Debug.Log("Disable selected");
 	}
 }
