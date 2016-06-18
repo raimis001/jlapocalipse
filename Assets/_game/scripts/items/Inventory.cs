@@ -27,11 +27,15 @@ public class Inventory : MonoBehaviour
 
 	public GameObject[] Cells;
 
+	public delegate void ChangeInventory();
+	public ChangeInventory OnChange;
+
 	public Dictionary<int, ItemMain> Items = new Dictionary<int, ItemMain>();
 
 	public void RemoveItem(ItemMain item)
 	{
 		Items.Remove(item.Inventory.Id);
+		if (OnChange != null) OnChange();
 	}
 
 	public bool AddItem(ItemMain item)
@@ -51,6 +55,7 @@ public class Inventory : MonoBehaviour
 		item.transform.localPosition = CellPosition(key);
 
 		Items.Add(key, item);
+		if (OnChange != null) OnChange();
 
 		return true;
 	}
@@ -63,7 +68,9 @@ public class Inventory : MonoBehaviour
 			int x = i - y*3;
 			Cells[i].SetActive(x < SizeX && y < SizeY);
 		}
-
+		BoxCollider collider = GetComponent<BoxCollider>();
+		collider.size = new Vector3(SizeX * 0.5f, SizeY * 0.5f, 0.1f);
+		collider.center = new Vector3(collider.size.x * 0.5f, -collider.size.y * 0.5f + 0.25f, 0.27f);
 	}
 
 	int CellId(int x, int y)
@@ -73,9 +80,9 @@ public class Inventory : MonoBehaviour
 
 	public Vector3 CellPosition(int id)
 	{
-		int y = Mathf.FloorToInt((float)id / SizeX);
-		int x = id - y * SizeX;
-
+		int y = Mathf.FloorToInt(id / 3f);
+		int x = id - y * 3;
+		Debug.Log(" Get id:" + id + " pos:" + x + ":" + y);
 		return new Vector3(x * 0.5f, y * -0.5f);
 	}
 
