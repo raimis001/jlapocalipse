@@ -6,11 +6,7 @@ public class GameLogic : MonoBehaviour
 {
 
 	private static GameLogic _instance;
-
-	public static GameLogic Instance
-	{
-		get { return _instance; }
-	}
+	public static GameLogic Instance { get { return _instance; } }
 
 	public static Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
 	public static List<Build> Places = new List<Build>();
@@ -19,7 +15,6 @@ public class GameLogic : MonoBehaviour
 	{
 		return Instance.DevicesPrefab[(int)type];
 	}
-
 	public static void CreateRoom(RoomPosition pos)
 	{
 		Room room = Room.CreateRoom(pos, RoomType.SERVICE);
@@ -42,7 +37,6 @@ public class GameLogic : MonoBehaviour
 		
 		ClearPlaces();
 	}
-
 	private static void ClearPlaces()
 	{
 		foreach (Build build in Places)
@@ -81,11 +75,15 @@ public class GameLogic : MonoBehaviour
 		}
 	}
 
+	public static ItemMain DragItem;
+
 	public GameObject CaveObject;
 	public GameObject RoomPrefab;
 	public GameObject BuildPrefab;
 
 	public GameObject[] DevicesPrefab;
+
+	public GameObject[] Items;
 
 	[Header("Interface")]
 	public GameObject BuildMenu;
@@ -149,5 +147,12 @@ public class GameLogic : MonoBehaviour
 		{
 			yield return room.Position.Property;
 		}
+	}
+
+	public static ItemMain CreateItem(ItemKind kind)
+	{
+	
+		GameObject obj = Instantiate(Instance.Items[(int) kind]);
+		return obj.GetComponent<ItemMain>();
 	}
 }

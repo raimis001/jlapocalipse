@@ -8,6 +8,8 @@ public class CameraManager : MonoBehaviour
 	public float verticalScrollSpeed = 1;
 	public float zoomSpeed = 1;
 
+	public float depthMin = -5;
+
 	Vector3 _dragg;
 	// Use this for initialization
 	void Start()
@@ -49,6 +51,6 @@ public class CameraManager : MonoBehaviour
 	{
 		Vector3 _moveVector = new Vector3(x * horizontalScrollSpeed, y * verticalScrollSpeed, z * zoomSpeed) * Time.deltaTime;
 		transform.Translate(_moveVector);
-		transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, -150, -10));
+		transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, -150, depthMin));
 	}
 }

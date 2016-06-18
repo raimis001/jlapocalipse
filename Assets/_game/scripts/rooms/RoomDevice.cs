@@ -19,6 +19,7 @@ public class RoomDevice : MonoBehaviour
 	public RoomPosition Room;
 	public Light Power;
 
+	public Inventory Inventory;
 
 	private bool _lightsOn = true;
 	public bool LightsOn {
@@ -32,6 +33,24 @@ public class RoomDevice : MonoBehaviour
 				Power.gameObject.SetActive(_lightsOn);
 			}
 		}
+	}
+
+	public virtual void EndDrag(ItemMain item)
+	{
+		Debug.Log("End dragging item:" + item.ItemKind);
+
+		if (!Inventory)
+		{
+			item.ResetPosition();
+			return;
+		}
+
+		if (!Inventory.AddItem(item))
+		{
+			item.ResetPosition();
+		}
+
+
 	}
 
 }
