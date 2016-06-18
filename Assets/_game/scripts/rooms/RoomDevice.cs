@@ -35,6 +35,16 @@ public class RoomDevice : MonoBehaviour
 		}
 	}
 
+	protected virtual void Start()
+	{
+		if (Inventory) Inventory.OnChange = InventoryChanged;
+	}
+
+	protected virtual void Update()
+	{
+		
+	}
+
 	public virtual void EndDrag(ItemMain item)
 	{
 		Debug.Log("End dragging item:" + item.ItemKind);
@@ -49,7 +59,15 @@ public class RoomDevice : MonoBehaviour
 		{
 			item.ResetPosition();
 		}
+	}
 
+	private void InventoryChanged()
+	{
+		OnInventoryChange();
+	}
+
+	protected virtual void OnInventoryChange()
+	{
 
 	}
 

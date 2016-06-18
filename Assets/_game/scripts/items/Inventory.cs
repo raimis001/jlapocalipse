@@ -27,21 +27,36 @@ public class Inventory : MonoBehaviour
 
 	public GameObject[] Cells;
 
+	public List<ItemKind> Accept = new List<ItemKind>();
+
 	public delegate void ChangeInventory();
+
+	public bool AcceptAll = true;
 	public ChangeInventory OnChange;
+
+	public int Count
+	{
+		get { return Items.Count; }
+	}
 
 	public Dictionary<int, ItemMain> Items = new Dictionary<int, ItemMain>();
 
-	public void RemoveItem(ItemMain item)
+	public void RemoveItem(ItemMain item, bool destroy = false)
 	{
 		Items.Remove(item.Inventory.Id);
+
+		if (destroy) Destroy(item.gameObject);
+
 		if (OnChange != null) OnChange();
 	}
 
 	public bool AddItem(ItemMain item)
 	{
+		if (!AcceptAll && !Accept.Contains(item.ItemKind)) return false;
+
 		int key = FindFree();
 		if (key < 0) return false;
+
 
 		if (item.Inventory.Parent)
 		{
@@ -82,14 +97,13 @@ public class Inventory : MonoBehaviour
 	{
 		int y = Mathf.FloorToInt(id / 3f);
 		int x = id - y * 3;
-		Debug.Log(" Get id:" + id + " pos:" + x + ":" + y);
 		return new Vector3(x * 0.5f, y * -0.5f);
 	}
 
 	int FindFree()
 	{
 		int result = -1;
-		int size = SizeX * SizeY;
+
 		for (int i = 0; i < Cells.Length; i++)
 		{
 			if (!Cells[i].activeSelf) continue;

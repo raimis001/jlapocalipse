@@ -36,12 +36,15 @@ public class WaterRandomize : MonoBehaviour
 	void Update()
 	{
 
-		if (Math.Abs(Value - val) > 0.001f) Value = val;
 
-		if (!Application.isPlaying && Water)
+		if (!Application.isPlaying )
 		{
-			Water.localScale = new Vector3(Water.localScale.x, Value, Water.localScale.z);
-			return;
+			if (Math.Abs(Value - val) > 0.001f) Value = val;
+		}
+
+		if (Water)
+		{
+			//Water.localScale = new Vector3(Water.localScale.x, Value, Water.localScale.z);
 		}
 
 		if (!Water || isTweening) return;
@@ -57,7 +60,7 @@ public class WaterRandomize : MonoBehaviour
 		isTweening = true;
 		isBreak = false;
 
-		float delta = Mathf.Clamp(val + Random.Range(0, 0.01f)*direction,0f,1f);
+		float delta = Mathf.Clamp(_val + Random.Range(0, 0.01f)*direction,0f,1f);
 		Vector3 scale = Water.localScale;
 
 		while (Mathf.Abs(Water.localScale.y - delta) > 0.01f)

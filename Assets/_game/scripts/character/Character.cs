@@ -26,7 +26,6 @@ public class Character : MonoBehaviour
 
 	public void OnMouseUp()
 	{
-		Debug.Log("Caharcter click");
 		Inventory.gameObject.SetActive(!Inventory.gameObject.activeSelf);
 	}
 

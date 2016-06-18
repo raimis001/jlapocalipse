@@ -1,22 +1,30 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.UI;
 
 public enum ItemKind
 {
 	Food,
-	Water
+	Water,
+	Grain
 }
 
 public class ItemMain : MonoBehaviour
 {
+	public Text ValueText;
 
 	public ItemKind ItemKind;
 	public InventoryKey Inventory;
 
+	public int Value = 10;
 
 	public void ResetPosition()
 	{
 		transform.localPosition = Inventory.Position();
+	}
+
+	public void Update()
+	{
+		if (ValueText) ValueText.text = Value.ToString();
 	}
 
 	public void OnMouseDown()
@@ -33,7 +41,7 @@ public class ItemMain : MonoBehaviour
 		{
 			if (hit.collider.gameObject.GetComponent<Inventory>())
 			{
-				Debug.Log("Hit inventory");
+				//Debug.Log("Hit inventory");
 				if (hit.collider.gameObject.GetComponent<Inventory>().AddItem(this))
 				{
 					return;
@@ -43,6 +51,7 @@ public class ItemMain : MonoBehaviour
 
 		ResetPosition();
 	}
+
 
 	public void OnMouseDrag()
 	{
