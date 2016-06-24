@@ -9,6 +9,7 @@ public class CameraManager : MonoBehaviour
 	public float zoomSpeed = 1;
 
 	public float depthMin = -5;
+	public float depthMax = -150;
 
 	Vector3 _dragg;
 	// Use this for initialization
@@ -44,13 +45,12 @@ public class CameraManager : MonoBehaviour
 		}
 
 		MoveMe(xAxisValue, yAxisValue, zMove);
-
 	}
 
 	private void MoveMe(float x, float y, float z)
 	{
 		Vector3 _moveVector = new Vector3(x * horizontalScrollSpeed, y * verticalScrollSpeed, z * zoomSpeed) * Time.deltaTime;
 		transform.Translate(_moveVector);
-		transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, -150, depthMin));
+		transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, depthMax, depthMin));
 	}
 }
