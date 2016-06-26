@@ -29,11 +29,12 @@ public class ItemMain : MonoBehaviour
 
 	public void OnMouseDown()
 	{
-
+		Debug.Log(" mouse down Item:" + ItemKind);
 	}
 
 	public void OnMouseUp()
 	{
+		Debug.Log(" mouse up Item:" + ItemKind);
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit[] hits = Physics.RaycastAll(ray);
 

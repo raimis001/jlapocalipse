@@ -10,7 +10,7 @@ public class HexaTile : MonoBehaviour
 
 	public void Start()
 	{
-		Clouds.SetActive(false);
+		Clouds.SetActive(true);
 		Buildings.SetActive(true);
 	}
 

@@ -111,7 +111,7 @@ namespace ProceduralCity
     
         public void Generate(bool cone)
         {
-            originalSeed = Random.seed;
+						originalSeed = Random.seed;
 
             coneTree = cone;
             // Tree parameter checksum
