@@ -37,18 +37,23 @@ public class Drone : MonoBehaviour
 		if (Attachment) Attachment.position = transform.position;
 	}
 
-	void OnInventoryChange() 
+	void OnInventoryChange()
 	{
 		Rigidbody.mass = 10 + Inventory.Count * 3;
 	}
 
 	public void OnMouseDown()
 	{
-		Debug.Log("Drone mouse down");
+		//Debug.Log("Drone mouse down");
 	}
 
 	public void OnMouseUp()
 	{
-		Debug.Log("Drone mouse up");
+		//Debug.Log("Drone mouse up");
+	}
+
+	public void OnMouseUpAsButton()
+	{
+		Inventory.Visible = !Inventory.Visible;
 	}
 }

@@ -34,6 +34,14 @@ public class Inventory : MonoBehaviour
 	public bool AcceptAll = true;
 	public ChangeInventory OnChange;
 
+	public bool Visible 
+	{
+		get { return gameObject.activeSelf; }
+		set {
+			gameObject.SetActive(value);
+		}
+	}
+
 	public int Count
 	{
 		get { return Items.Count; }

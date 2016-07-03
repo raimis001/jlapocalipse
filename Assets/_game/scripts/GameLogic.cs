@@ -77,9 +77,11 @@ public class GameLogic : MonoBehaviour
 
 	public static ItemMain DragItem;
 
+	[Header("Prefabs")]
 	public GameObject CaveObject;
 	public GameObject RoomPrefab;
 	public GameObject BuildPrefab;
+	public GameObject BulletPrefab;
 
 	public GameObject[] DevicesPrefab;
 
