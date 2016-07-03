@@ -34,16 +34,14 @@ public class Inventory : MonoBehaviour
 	public bool AcceptAll = true;
 	public ChangeInventory OnChange;
 
-	public bool Visible 
-	{
+	public bool Visible {
 		get { return gameObject.activeSelf; }
 		set {
 			gameObject.SetActive(value);
 		}
 	}
 
-	public int Count
-	{
+	public int Count {
 		get { return Items.Count; }
 	}
 
@@ -87,8 +85,8 @@ public class Inventory : MonoBehaviour
 	{
 		for (int i = 0; i < Cells.Length; i++)
 		{
-			int y = Mathf.FloorToInt(i/3f);
-			int x = i - y*3;
+			int y = Mathf.FloorToInt(i / 3f);
+			int x = i - y * 3;
 			Cells[i].SetActive(x < SizeX && y < SizeY);
 		}
 		BoxCollider collider = GetComponent<BoxCollider>();
@@ -124,6 +122,17 @@ public class Inventory : MonoBehaviour
 		}
 
 		return result;
+	}
+
+	public IEnumerable<ItemMain> GetItems(ItemKind kind)
+	{
+		foreach (ItemMain item in Items.Values) 
+		{
+			if (item.ItemKind == kind) 
+			{
+				yield return item;
+			}
+		}
 	}
 
 }

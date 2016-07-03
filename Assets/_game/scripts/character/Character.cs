@@ -16,7 +16,7 @@ public class Character : MonoBehaviour
 	{
 		if (Input.GetMouseButtonUp(1))
 		{
-			ItemMain item = GameLogic.CreateItem(Helper.GetRandomEnum<ItemKind>());
+			ItemMain item = ItemMain.Create(Helper.GetRandomEnum<ItemKind>());
 			if (!Inventory.AddItem(item))
 			{
 				Destroy(item.gameObject);

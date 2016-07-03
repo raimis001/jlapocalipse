@@ -13,6 +13,8 @@ public class Drone : MonoBehaviour
 	public Transform Attachment;
 	public Inventory Inventory;
 
+	public WeaponControler Weapon;
+
 	public Transform[] Rotors;
 
 	Rigidbody Rigidbody;
@@ -35,10 +37,30 @@ public class Drone : MonoBehaviour
 		}
 
 		if (Attachment) Attachment.position = transform.position;
+
+		CheckInventory();
 	}
 
 	void OnInventoryChange()
 	{
+		Rigidbody.mass = 10 + Inventory.Count * 3;
+	}
+
+	void CheckInventory()
+	{
+		if (!Weapon) return;
+		if (!Inventory || Inventory.Count < 1) return;
+		if (Weapon.Ammo + 20 > Weapon.AmmoCount) return;
+
+
+		foreach (ItemMain item in Inventory.GetItems(ItemKind.Ammo))
+		{
+			if (Weapon.Ammo + item.Value > Weapon.AmmoCount) continue;
+
+			Weapon.Ammo += item.Value;
+			Inventory.RemoveItem(item, true);
+			break;
+		}
 		Rigidbody.mass = 10 + Inventory.Count * 3;
 	}
 

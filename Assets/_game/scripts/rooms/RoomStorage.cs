@@ -13,6 +13,14 @@ public class RoomStorage : RoomDevice
 	public Digits7[] Display;
 	public GameObject Sign;
 
+	public Inventory[] Inventorys;
+
+	protected override void Start()
+	{
+		base.Start();
+		Inventorys[0].AddItem(ItemMain.Create(ItemKind.Ammo));
+	}
+
 	protected override void Update()
 	{
 		base.Update();
@@ -32,20 +40,13 @@ public class RoomStorage : RoomDevice
 
 	void DrawDisplay() 
 	{
-		//string num = _temperature.ToString();
-
-		//int t = Mathf.Abs(_temperature);
-
 		Sign.SetActive(Mathf.Sign(_display) < 0);
 
 		int d = _display / 10;
 		int n = _display - d * 10;
 
-		//Debug.Log("Display temp:" + _temperature + " d:" + d + " n:" + n);
-
 		Display[0].Number =  d;
 		Display[1].Number = n;
-
 	}
 
 	public void PowerSwitch() 

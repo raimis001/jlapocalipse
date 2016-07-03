@@ -50,16 +50,13 @@ public class RoomHydrophonic : RoomDevice
 		if (!Inventory || Inventory.Count < 1) return;
 		if (WaterStore >= WaterMax) return;
 
-		foreach (ItemMain item in Inventory.Items.Values)
+		foreach (ItemMain item in Inventory.GetItems(ItemKind.Water))
 		{
-			if (item.ItemKind == ItemKind.Water)
-			{
-				if (WaterStore + item.Value > WaterMax) continue;
+			if (WaterStore + item.Value > WaterMax) continue;
 
-				WaterStore += item.Value;
-				Inventory.RemoveItem(item, true);
-				break;
-			}
+			WaterStore += item.Value;
+			Inventory.RemoveItem(item, true);
+			break;
 		}
 	}
 

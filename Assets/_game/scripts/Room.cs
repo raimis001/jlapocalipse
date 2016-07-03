@@ -15,10 +15,10 @@ public class Room : MonoBehaviour
 	public GameObject Lights;
 
 	[Header("Indicators")]
-	public Progress3D DamageProgress;
-	public Progress3D EnergyStorage;
-	public Progress3D OxigenStorage;
-	public Progress3D TemperatureStorage;
+	public ProgressBar DamageProgress;
+	public ProgressBar EnergyStorage;
+	public ProgressBar OxigenStorage;
+	public ProgressBar TemperatureStorage;
 
 	[HideInInspector]
 	public RoomDevice Device;

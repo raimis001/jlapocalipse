@@ -151,10 +151,5 @@ public class GameLogic : MonoBehaviour
 		}
 	}
 
-	public static ItemMain CreateItem(ItemKind kind)
-	{
-	
-		GameObject obj = Instantiate(Instance.Items[(int) kind]);
-		return obj.GetComponent<ItemMain>();
-	}
+
 }

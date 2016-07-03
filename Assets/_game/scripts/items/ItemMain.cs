@@ -5,7 +5,8 @@ public enum ItemKind
 {
 	Food,
 	Water,
-	Grain
+	Grain,
+	Ammo
 }
 
 public class ItemMain : MonoBehaviour
@@ -69,11 +70,18 @@ public class ItemMain : MonoBehaviour
 				//Debug.Log("Hit room device");
 				z = hit.point.z - 0.25f;
 				distance_to_screen = Camera.main.WorldToScreenPoint(hit.point).z;
+				break;
 			}
 		}
 		Vector3 pos_move = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
 
 		transform.position = new Vector3(pos_move.x - 0.25f, pos_move.y - 0.0f, z);
 
+	}
+
+	public static ItemMain Create(ItemKind kind) 
+	{
+		GameObject obj = Instantiate(GameLogic.Instance.Items[(int)kind]);
+		return obj.GetComponent<ItemMain>();
 	}
 }

@@ -4,13 +4,25 @@ using System.Collections;
 public class WeaponControler : MonoBehaviour
 {
 
+	public int Ammo;
+	public int AmmoCount = 100;
+
 	public Transform WeaponBody;
 	public Transform BulletSpawn;
 
+	public ProgressBar ProgressAmmo;
+
 	private HealthControler Target;
+
+	[Range(0, 2f)]
+	public float ShotSpeed = 0.1f;
 
 	private float shot = 2;
 
+	void Start() 
+	{
+		Ammo = AmmoCount;
+	}
 
 	void Update()
 	{
@@ -22,14 +34,28 @@ public class WeaponControler : MonoBehaviour
 			WeaponBody.rotation = targetRotation;
 			targetPoint = WeaponBody.localEulerAngles;
 
-			targetPoint.x = Mathf.Clamp(targetPoint.x + Random.Range(-2f,2f) , 0, 60) ;
+
+			if (Ammo < 1) 
+			{
+				shot = ShotSpeed;
+			} 
+			else 
+			{
+				targetPoint.x = Mathf.Clamp(targetPoint.x + Random.Range(-2f, 2f), 0, 60);
+			}
+
 			WeaponBody.localEulerAngles = targetPoint;
 
-			shot -= Time.deltaTime; 
-			if (shot <= 0) 
+			shot -= Time.deltaTime;
+			if (shot <= 0)
 			{
-				shot = 0.1f;
-				Bullet.Shot(BulletSpawn.transform.position, BulletSpawn.transform.rotation);
+				shot = ShotSpeed;
+				Bullet.Shot(BulletSpawn.transform.position, BulletSpawn.transform.rotation, 1f);
+				Ammo--;
+				if (ProgressAmmo) 
+				{
+					ProgressAmmo.Value = (float)Ammo / AmmoCount;
+				}
 			}
 
 			return;
@@ -39,4 +65,7 @@ public class WeaponControler : MonoBehaviour
 		Debug.Log("Find target @" + Target.position);
 
 	}
+
+
+
 }
