@@ -62,7 +62,7 @@ public class WeaponControler : MonoBehaviour
 		}
 
 		Target = Helper.FindClosestTarget<HealthControler>(transform.position);
-		Debug.Log("Find target @" + Target.position);
+		if (Target) Debug.Log("Find target @" + Target.position);
 
 	}
 

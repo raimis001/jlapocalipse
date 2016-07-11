@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class Digits7 : MonoBehaviour
 {
 
-	[Range(0,9)]
+	[Range(-1,9)]
 	public int Number;
 
 	public GameObject[] Digits;
@@ -43,6 +43,14 @@ public class Digits7 : MonoBehaviour
 	void DrawDigit() 
 	{
 		//Debug.Log("Draw digit:" + Number);
+		if (Number < 0)
+		{
+			for (int i = 0; i < Digits.Length; i++)
+			{
+				Digits[i].SetActive(false);
+			}
+			return;
+		}
 		int[] r = numbers[Mathf.Abs(Number)];
 		for (int i = 0; i < Digits.Length; i++) {
 			Digits[i].SetActive(r[i] == 1);

@@ -101,7 +101,7 @@ public class GameLogic : MonoBehaviour
 
 	void Start()
 	{
-		CreateRoom(new RoomPosition());
+		//CreateRoom(new RoomPosition());
 		BuildMenu.SetActive(true);
 		RoomMenu.SetActive(false);
 	}
