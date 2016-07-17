@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 
+[ExecuteInEditMode]
 public class Room : MonoBehaviour
 {
 
@@ -23,6 +24,8 @@ public class Room : MonoBehaviour
 	[HideInInspector]
 	public RoomDevice Device;
 
+	public RoomType RoomType;
+
 	private RoomType _type;
 	public RoomType Type {
 		get { return _type; }
@@ -36,6 +39,8 @@ public class Room : MonoBehaviour
 				Destroy(Device.gameObject);
 			}
 		
+			if (_type == RoomType.NONE) return;
+
 			Device = RoomDevice.Create(_type, transform, Position);
 			Device.LightsOn = _lightsOn;
 		}
@@ -108,6 +113,16 @@ public class Room : MonoBehaviour
 			_weight = Weight;
 			SetWalls();
 		}
+
+		if (!Application.isPlaying)
+		{
+			Walls[3].SetActive(RoomType != RoomType.ELEVATOR);
+			Walls[4].SetActive(RoomType != RoomType.ELEVATOR);
+			Walls[5].SetActive(RoomType == RoomType.ELEVATOR);
+			transform.position = RoomPosition.Vector3(Position);
+			return;
+		}
+
 		if (Position == null) return;
 
 		RoomProperty p = Position.Property;

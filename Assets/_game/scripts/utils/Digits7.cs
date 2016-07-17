@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,9 +12,9 @@ public class Digits7 : MonoBehaviour
 
 	public GameObject[] Digits;
 
-	int _number = -1;
+	int _number = int.MaxValue;
 
-	static Dictionary<int, int[]> numbers = new Dictionary<int, int[]>()
+	private static readonly Dictionary<int, int[]> Numbers = new Dictionary<int, int[]>()
 	{
 		{0, new int[7] {1,1,1,1,1,1,0 } },
 		{1, new int[7] {1,1,0,0,0,0,0 } },
@@ -29,7 +30,7 @@ public class Digits7 : MonoBehaviour
 
 	void Start()
 	{
-
+		_number = int.MaxValue;
 	}
 
 	void Update()
@@ -51,7 +52,7 @@ public class Digits7 : MonoBehaviour
 			}
 			return;
 		}
-		int[] r = numbers[Mathf.Abs(Number)];
+		int[] r = Numbers[Mathf.Abs(Number)];
 		for (int i = 0; i < Digits.Length; i++) {
 			Digits[i].SetActive(r[i] == 1);
 		}

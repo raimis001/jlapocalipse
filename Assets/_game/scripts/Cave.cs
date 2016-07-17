@@ -5,11 +5,13 @@ using System;
 
 public enum RoomType
 {
-	SERVICE = 0,
-	LIVING = 1,
-	ENERGY = 2,
-	OXIGEN = 3,
-	MEAL = 4,
+	NONE,
+	SERVICE,
+	LIVING,
+	ENERGY,
+	OXIGEN,
+	MEAL,
+	ELEVATOR,
 }
 
 public struct P
@@ -127,7 +129,7 @@ public class RoomProperty
 	}
 }
 
-
+[Serializable]
 public class RoomPosition
 {
 	public int x;
@@ -174,7 +176,7 @@ public class RoomPosition
 	#region STATIC
 	public static Vector3 Vector3(RoomPosition pos)
 	{
-		return new Vector3(pos.x * 10, pos.y * 8, 0);
+		return new Vector3(pos.x * 10, pos.y * -8, 0);
 	}
 
 	public static string Hash(int x, int y)
