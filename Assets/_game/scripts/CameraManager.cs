@@ -51,6 +51,7 @@ public class CameraManager : MonoBehaviour
 	{
 		Vector3 _moveVector = new Vector3(x * horizontalScrollSpeed, y * verticalScrollSpeed, z * zoomSpeed) * Time.deltaTime;
 		transform.Translate(_moveVector);
-		transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, depthMax, depthMin));
+		//transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, depthMax, depthMin));
+		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, Mathf.Clamp(transform.localPosition.z, depthMax, depthMin));
 	}
 }

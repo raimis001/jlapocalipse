@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum TileKind
@@ -9,10 +10,21 @@ public enum TileKind
 	School,
 }
 
+[Serializable]
 public struct TilePos
 {
+
 	public int x;
 	public int y;
+
+
+	public Vector3 Position
+	{
+		get
+		{
+			return new Vector3(x * 5f + (y % 2 == 0 ? 0 : 2.5f),0, y * Mathf.Sqrt(3f) * 2.5f);
+		}
+	}
 
 	public string HashString
 	{

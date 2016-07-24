@@ -407,5 +407,5 @@ Shader "Shader Forge/S_PBR_01" {
         }
     }
     FallBack "Diffuse"
-    CustomEditor "ShaderForgeMaterialInspector"
+    //CustomEditor "ShaderForgeMaterialInspector"
 }

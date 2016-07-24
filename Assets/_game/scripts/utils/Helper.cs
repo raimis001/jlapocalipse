@@ -1,12 +1,14 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public static class Helper 
+public static class Helper
 {
 	public static T GetRandomEnum<T>()
 	{
 		System.Array A = System.Enum.GetValues(typeof(T));
-		T V = (T)A.GetValue(UnityEngine.Random.Range(0, A.Length));
+		T V = (T) A.GetValue(UnityEngine.Random.Range(0, A.Length));
 		return V;
 	}
 
@@ -30,4 +32,53 @@ public static class Helper
 		return closest;
 	}
 
+
 }
+
+public class WeightClass<T>
+{
+	public float Weight { get; set; }
+	public T Value { get; set; }
+}
+
+public static class Weighted
+{
+	public static float TotalWeight = 0;
+
+	public static WeightClass<T> Create<T>(float weight, T value)
+	{
+		TotalWeight += weight;
+		return new WeightClass<T> { Weight = weight, Value = value };
+	}
+
+	//private static readonly System.Random random = new System.Random();
+
+	public static T GetWeighted<T>(this IEnumerable<WeightClass<T>> collection)
+	{
+		//var rnd = random.NextDouble();
+		//Debug.Log(rnd);
+
+		float total = 0;
+
+		float random = UnityEngine.Random.Range(0, TotalWeight + 0.00f);
+		foreach (var item in collection)
+		{
+			total += item.Weight;
+			if (total >= random)
+			{
+				return item.Value;
+			}
+
+			/*
+				if (rnd < item.Weight)
+				{
+					Debug.Log("weight:" + item.Weight + " value:" + item.Value);
+					return item.Value;
+				}
+				rnd -= item.Weight;
+			*/
+		}
+		throw new InvalidOperationException("The proportions in the collection do not add up to 1.");
+	}
+}
+
