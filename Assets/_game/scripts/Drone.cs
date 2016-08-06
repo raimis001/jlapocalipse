@@ -22,7 +22,10 @@ public class Drone : MonoBehaviour
 	void Start()
 	{
 		Rigidbody = GetComponent<Rigidbody>();
-		Inventory.OnChange = OnInventoryChange;
+		if (Inventory)
+		{
+			Inventory.OnChange = OnInventoryChange;
+		}
 	}
 
 	// Update is called once per frame
