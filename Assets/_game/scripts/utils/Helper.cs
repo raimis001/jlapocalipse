@@ -32,6 +32,15 @@ public static class Helper
 		return closest;
 	}
 
+	public static float AngleInRad(Vector3 vec1, Vector3 vec2)
+	{
+		return Mathf.Atan2(vec2.x - vec1.x, vec2.z - vec1.z);
+	}
+
+	public static float AngleInDeg(Vector3 vec1, Vector3 vec2)
+	{
+		return AngleInRad(vec1, vec2) * 180f / Mathf.PI;
+	}
 
 }
 
