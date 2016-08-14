@@ -18,8 +18,6 @@ public class BulletTest : MonoBehaviour
 
 	private float _snipper;
 
-
-	private bool isShooting;
 	private float shotingTime;
 
 	private List<WeightClass<float>> Target = new List<WeightClass<float>>();
@@ -83,12 +81,10 @@ public class BulletTest : MonoBehaviour
 	public void OnMouseUp()
 	{
 		Debug.Log("Mouse upped");
-		isShooting = false;
 	}
 
 	public void OnMouseDown()
 	{
-		isShooting = true;
 	}
 
 	void DoShot()

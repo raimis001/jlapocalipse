@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 
 public class GameLogic : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class GameLogic : MonoBehaviour
 	private static GameLogic _instance;
 	public static GameLogic Instance { get { return _instance; } }
 
-	public static Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
+	//public static Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
 	public static List<Build> Places = new List<Build>();
 
 	public static GameObject Device(RoomType type)
@@ -33,8 +34,6 @@ public class GameLogic : MonoBehaviour
 
 		room.Weight = weight;
 
-		Rooms.Add(room.Position.ToString(), room);
-		
 		ClearPlaces();
 	}
 	private static void ClearPlaces()
@@ -112,29 +111,6 @@ public class GameLogic : MonoBehaviour
 		OxigeGen.text = Cave.Storage.Oxigen.ToString();
 	}
 
-	public void StartBuild()
-	{
-		ClearPlaces();
-
-		foreach (Room room in Rooms.Values)
-		{
-			switch (room.Weight)
-			{
-				case 0:
-					Places.Add(Build.CreateBuild(room.Position.x - 1, room.Position.y));
-					Places.Add(Build.CreateBuild(room.Position.x + 1, room.Position.y));
-					break;
-				case 1:
-					Places.Add(Build.CreateBuild(room.Position.x + 1, room.Position.y));
-					break;
-				case 2:
-					Places.Add(Build.CreateBuild(room.Position.x - 1, room.Position.y));
-					break;
-			}
-		}
-
-	}
-
 	public void MakeDevice(int type)
 	{
 		if (!_selectedRoom) return;
@@ -143,13 +119,67 @@ public class GameLogic : MonoBehaviour
 
 	}
 
-	public static IEnumerable<RoomProperty> Properties()
-	{
-		foreach (Room room in Rooms.Values)
+	public static BarValues GetValues() {
+		
+		RoomDevice[] devices = FindObjectsOfType<RoomDevice>();
+		BarValues values = new BarValues();
+
+		float eC = 0;
+		float eU = 0;
+		foreach (RoomDevice device in devices) 
 		{
-			yield return room.Position.Property;
+
+			if (device.Working)
+			{
+				if (device.Values.Energy > 0)
+				{
+					eC += device.Values.Energy;
+				}
+				else
+				{
+					eU += -device.Values.Energy;
+				}
+			}
+
 		}
+
+		if (eC < eU) {
+			values.Energy = 0;
+			
+			foreach (RoomDevice device in devices.OrderBy(d => d.Values.Energy)) {
+				if (!device.Working || device.Values.Energy > 0) continue;
+
+				device.Working = false;
+				eU += device.Values.Energy;
+
+				if (eU <= eC) break;
+			}
+		}
+
+		values.Energy = 1 - 1 / (eC / eU);
+
+
+		return values;
 	}
 
+	public static Room RoomByPosition(int x, int y) 
+	{
+		RoomPosition pos = new RoomPosition() { x = x, y = y };
+		return RoomByPosition(pos);
+	}
 
+	public static Room RoomByPosition(RoomPosition position) 
+	{
+		Room[] rooms = FindObjectsOfType<Room>();
+
+		foreach (Room room in rooms) 
+		{
+			if (room.Position.Equals(position)) 
+			{
+				return room;
+			}
+		}
+
+		return null;
+	}
 }

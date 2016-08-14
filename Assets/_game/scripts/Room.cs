@@ -1,6 +1,69 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.EventSystems;
+using System;
+
+[Serializable]
+public struct RoomPosition
+{
+	public int x;
+	public int y;
+
+	public RoomPosition Left {
+		get { return new RoomPosition() { x = x - 1, y = y }; }
+	}
+	public RoomPosition Right {
+		get { return new RoomPosition() { x = x + 1, y = y }; }
+	}
+
+	public Room LeftRoom {
+		get { return GameLogic.RoomByPosition(Left); }
+	}
+	public Room RightRoom {
+		get { return GameLogic.RoomByPosition(Right); }
+	}
+
+	public bool HasLeft()
+	{
+		return GameLogic.RoomByPosition(Left) != null;
+	}
+	public bool HasRight()
+	{
+		return GameLogic.RoomByPosition(Right) != null;
+	}
+
+	public string hash {
+		get { return string.Format("{0}:{1}", x, y); }
+	}
+
+	public override string ToString()
+	{
+		return hash;
+	}
+
+	public override bool Equals(object obj)
+	{
+		return ((RoomPosition)obj).hash.Equals(hash);
+	}
+	public override int GetHashCode()
+	{
+		return 0;
+	}
+
+	public Vector3 Position 
+	{
+		get {
+			return Vector3(this);
+		}
+	}
+
+	#region STATIC
+	public static Vector3 Vector3(RoomPosition pos)
+	{
+		return new Vector3(pos.x * 10, pos.y * -8, 0);
+	}
+	#endregion
+}
+
 
 [ExecuteInEditMode]
 public class Room : MonoBehaviour
@@ -14,16 +77,9 @@ public class Room : MonoBehaviour
 	public int Weight;
 
 	public GameObject Lights;
+	public BarDevice Bar;
 
-	[Header("Indicators")]
-	public ProgressBar DamageProgress;
-	public ProgressBar EnergyStorage;
-	public ProgressBar OxigenStorage;
-	public ProgressBar TemperatureStorage;
-
-	[HideInInspector]
-	public RoomDevice Device;
-
+	private RoomType _roomType;
 	public RoomType RoomType;
 
 	private RoomType _type;
@@ -31,8 +87,6 @@ public class Room : MonoBehaviour
 		get { return _type; }
 		set {
 			_type = value;
-
-			Position.Property = new RoomProperty() { RoomType = _type };
 
 			if (Device)
 			{
@@ -78,7 +132,10 @@ public class Room : MonoBehaviour
 		}
 	}
 
-	public RoomPosition Position = new RoomPosition();
+	private RoomPosition _position;
+	public RoomPosition Position;
+
+	internal RoomDevice Device;
 
 	public static Room CreateRoom(RoomPosition pos, RoomType type)
 	{
@@ -103,36 +160,24 @@ public class Room : MonoBehaviour
 	void Start()
 	{
 		transform.position = RoomPosition.Vector3(Position);
+		SetWalls();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		if (Weight != _weight)
+		if (Weight != _weight || _roomType != RoomType || !_position.Equals(Position))
 		{
 			_weight = Weight;
+			_roomType = RoomType;
+			_position.x = Position.x;
+			_position.y = Position.y;
 			SetWalls();
 		}
 
-		if (!Application.isPlaying)
-		{
-			Walls[3].SetActive(RoomType != RoomType.ELEVATOR);
-			Walls[4].SetActive(RoomType != RoomType.ELEVATOR);
-			Walls[5].SetActive(RoomType == RoomType.ELEVATOR);
-			transform.position = RoomPosition.Vector3(Position);
-			return;
-		}
+		if (!Application.isPlaying) return;
 
-		if (Position == null) return;
 
-		RoomProperty p = Position.Property;
-		if (p == null) return; 
-
-		if (DamageProgress) DamageProgress.Value = p.Damage;
-		if (EnergyStorage) EnergyStorage.Value = Cave.Storage.Energy;
-		if (OxigenStorage) OxigenStorage.Value = Cave.Storage.Oxigen;
-
-		LightsOn = p.Use.Energy <= 1 ? Cave.Storage.Energy > 0.9f : Cave.Storage.Energy >= 0.5f;
 
 	}
 
@@ -166,12 +211,19 @@ public class Room : MonoBehaviour
 			break;
 		}
 
+		Walls[3].SetActive(RoomType != RoomType.ELEVATOR);
+		Walls[4].SetActive(RoomType != RoomType.ELEVATOR);
+		Walls[5].SetActive(RoomType == RoomType.ELEVATOR);
+
+		transform.position = RoomPosition.Vector3(Position);
+
+		CaveDraw.LastRoomCount = 0;
 	}
 
 	void OnMouseUp()
 	{
 		if (EventSystem.current.IsPointerOverGameObject()) return;
-
+		Debug.Log("room click at:" + Position);
 		GameLogic.SelectedRoom = this;
 	}
 

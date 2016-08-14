@@ -47,10 +47,10 @@ public class RoomHydrophonic : RoomDevice
 
 	void CheckInventory()
 	{
-		if (!Inventory || Inventory.Count < 1) return;
+		if (!Inventory || Inventory.Items.Count < 1) return;
 		if (WaterStore >= WaterMax) return;
 
-		foreach (ItemMain item in Inventory.GetItems(ItemKind.Water))
+		foreach (ItemMain item in Inventory.Items.GetItems(ItemKind.Water))
 		{
 			if (WaterStore + item.Value > WaterMax) continue;
 
@@ -62,9 +62,5 @@ public class RoomHydrophonic : RoomDevice
 
 	void ChekVagas()
 	{
-		foreach (Vaga vaga in Vagas)
-		{
-			
-		}
 	}
 }

@@ -91,3 +91,8 @@ public static class Weighted
 	}
 }
 
+public struct IntVector
+{
+	public int x;
+	public int y;
+}

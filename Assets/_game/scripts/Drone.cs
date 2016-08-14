@@ -46,17 +46,17 @@ public class Drone : MonoBehaviour
 
 	void OnInventoryChange()
 	{
-		Rigidbody.mass = 10 + Inventory.Count * 3;
+		Rigidbody.mass = 10 + Inventory.Items.Count * 3;
 	}
 
 	void CheckInventory()
 	{
 		if (!Weapon) return;
-		if (!Inventory || Inventory.Count < 1) return;
+		if (!Inventory || Inventory.Items.Count < 1) return;
 		if (Weapon.Ammo + 20 > Weapon.AmmoCount) return;
 
 
-		foreach (ItemMain item in Inventory.GetItems(ItemKind.Ammo))
+		foreach (ItemMain item in Inventory.Items.GetItems(ItemKind.Ammo))
 		{
 			if (Weapon.Ammo + item.Value > Weapon.AmmoCount) continue;
 
@@ -64,7 +64,7 @@ public class Drone : MonoBehaviour
 			Inventory.RemoveItem(item, true);
 			break;
 		}
-		Rigidbody.mass = 10 + Inventory.Count * 3;
+		Rigidbody.mass = 10 + Inventory.Items.Count * 3;
 	}
 
 	public void OnMouseDown()

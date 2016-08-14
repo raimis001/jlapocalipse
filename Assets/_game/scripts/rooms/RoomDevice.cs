@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[ExecuteInEditMode]
 public class RoomDevice : MonoBehaviour
 {
 
@@ -11,12 +12,13 @@ public class RoomDevice : MonoBehaviour
 		obj.transform.localPosition = Vector3.zero;
 
 		RoomDevice device = obj.GetComponent<RoomDevice>();
-		device.Room = pos;
+		device.Position = pos;
 
 		return device;
 	}
 
-	public RoomPosition Room;
+	private RoomPosition _position;
+	public RoomPosition Position;
 	public Light Power;
 
 	public Inventory Inventory;
@@ -35,6 +37,18 @@ public class RoomDevice : MonoBehaviour
 		}
 	}
 
+	private bool _working;
+	public bool Working = true;
+	private bool working 
+	{
+		set 
+		{
+			LightsOn = value;
+		}
+	}
+
+	public BarValues Values;
+
 	protected virtual void Start()
 	{
 		if (Inventory) Inventory.OnChange = InventoryChanged;
@@ -42,7 +56,18 @@ public class RoomDevice : MonoBehaviour
 
 	protected virtual void Update()
 	{
-		
+		if (Working != _working) 
+		{
+			_working = Working;
+			working = Working; 	
+		}
+
+		if (!Position.Equals(_position)) 
+		{
+			_position.x = Position.x;
+			_position.y = Position.y;
+			transform.position = _position.Position;
+		}
 	}
 
 	public virtual void EndDrag(ItemMain item)

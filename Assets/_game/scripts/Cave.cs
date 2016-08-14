@@ -129,66 +129,6 @@ public class RoomProperty
 	}
 }
 
-[Serializable]
-public class RoomPosition
-{
-	public int x;
-	public int y;
-
-	public RoomProperty Property;
-
-	public RoomPosition Left
-	{
-		get { return new RoomPosition() { x = x - 1, y = y }; }
-	}
-	public RoomPosition Right
-	{
-		get { return new RoomPosition() { x = x + 1, y = y }; }
-	}
-
-	public Room LeftRoom 
-	{
-		get { return GameLogic.Rooms[Left.hash]; }
-	}
-	public Room RightRoom {
-		get { return GameLogic.Rooms[Right.hash]; }
-	}
-
-	public bool HasLeft()
-	{
-		return GameLogic.Rooms.ContainsKey(Left.hash);
-	}
-	public bool HasRight()
-	{
-		return GameLogic.Rooms.ContainsKey(Right.hash);
-	}
-
-	public string hash
-	{
-		get { return Hash(x, y); }
-	}
-
-	public override string ToString()
-	{
-		return Hash(x, y);
-	}
-
-	#region STATIC
-	public static Vector3 Vector3(RoomPosition pos)
-	{
-		return new Vector3(pos.x * 10, pos.y * -8, 0);
-	}
-
-	public static string Hash(int x, int y)
-	{
-		return string.Format("{0}:{1}", x, y);
-	}
-	public static string Hash(RoomPosition pos)
-	{
-		return Hash(pos.x, pos.y);
-	}
-	#endregion
-}
 
 public static class  Cave
 {
@@ -315,6 +255,9 @@ public static class  Cave
 	public static void Update()
 	{
 
+		
+		
+		/*
 		float oxigenUse = 0;
 		float oxigenGen = 0;
 
@@ -336,7 +279,7 @@ public static class  Cave
 
 		Storage.Energy.Clamp(energyUse > 0 ? energyGen / energyUse : 1f);
 		Storage.Oxigen.ClampA((oxigenGen * Storage.Energy - oxigenUse) * Time.deltaTime * 0.01f);
-
+		*/
 		//Debug.Log("gen:" + energyGen + " use:" + energyUse + " energy:" + Storage.Energy);
 	}
 }
