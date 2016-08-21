@@ -19,8 +19,6 @@ public class guiSelectedRoom : MonoBehaviour
 	{
 		DisableAll();
 		if (!GameLogic.SelectedRoom) return;
-
-		Rooms[(int)GameLogic.SelectedRoom.Type].SetActive(true);
 	}
 
 	void OnDisable()

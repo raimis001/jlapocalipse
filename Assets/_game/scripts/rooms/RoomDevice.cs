@@ -5,18 +5,6 @@ using System.Collections;
 public class RoomDevice : MonoBehaviour
 {
 
-	public static RoomDevice Create(RoomType type, Transform parent, RoomPosition pos)
-	{
-		GameObject obj = Instantiate(GameLogic.Device(type)) as GameObject;
-		obj.transform.SetParent(parent);
-		obj.transform.localPosition = Vector3.zero;
-
-		RoomDevice device = obj.GetComponent<RoomDevice>();
-		device.Position = pos;
-
-		return device;
-	}
-
 	private RoomPosition _position;
 	public RoomPosition Position;
 	public Light Power;

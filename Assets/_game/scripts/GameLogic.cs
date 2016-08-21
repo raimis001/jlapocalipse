@@ -9,13 +9,9 @@ public class GameLogic : MonoBehaviour
 	private static GameLogic _instance;
 	public static GameLogic Instance { get { return _instance; } }
 
-	//public static Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
-	public static List<Build> Places = new List<Build>();
+	public static List<Room> Rooms = new List<Room>();
+	public static CavePathfinder Pathfinder = new CavePathfinder();
 
-	public static GameObject Device(RoomType type)
-	{
-		return Instance.DevicesPrefab[(int)type];
-	}
 	public static void CreateRoom(RoomPosition pos)
 	{
 		Room room = Room.CreateRoom(pos, RoomType.SERVICE);
@@ -34,17 +30,10 @@ public class GameLogic : MonoBehaviour
 
 		room.Weight = weight;
 
-		ClearPlaces();
 	}
-	private static void ClearPlaces()
-	{
-		foreach (Build build in Places)
-		{
-			Destroy(build.gameObject);
-		}
 
-		Places.Clear();
-	}
+	public delegate void RoomSelect(Room room);
+	public static event RoomSelect OnRoomSelect;
 
 	private static Room _selectedRoom;
 	public static Room SelectedRoom
@@ -60,6 +49,7 @@ public class GameLogic : MonoBehaviour
 					_selectedRoom = null;
 					Instance.BuildMenu.SetActive(true);
 					Instance.RoomMenu.SetActive(false);
+					if (OnRoomSelect != null) OnRoomSelect(null);
 					return;
 				}
 			}
@@ -71,6 +61,8 @@ public class GameLogic : MonoBehaviour
 			}
 			Instance.BuildMenu.SetActive(!_selectedRoom);
 			Instance.RoomMenu.SetActive(_selectedRoom);
+			if (OnRoomSelect != null) OnRoomSelect(_selectedRoom);
+
 		}
 	}
 
@@ -92,6 +84,8 @@ public class GameLogic : MonoBehaviour
 
 	[Header("Test")]
 	public Text OxigeGen;
+	public GridDraw PathDrawer;
+
 
 	void Awake()
 	{
@@ -103,20 +97,15 @@ public class GameLogic : MonoBehaviour
 		//CreateRoom(new RoomPosition());
 		BuildMenu.SetActive(true);
 		RoomMenu.SetActive(false);
+
+		Pathfinder.Prepare();
+		PathDrawer.DrawGrid();
 	}
 
 	void Update()
 	{
 		Cave.Update();
 		OxigeGen.text = Cave.Storage.Oxigen.ToString();
-	}
-
-	public void MakeDevice(int type)
-	{
-		if (!_selectedRoom) return;
-
-		_selectedRoom.Type = (RoomType)type;
-
 	}
 
 	public static BarValues GetValues() {

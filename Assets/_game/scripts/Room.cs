@@ -2,67 +2,6 @@
 using UnityEngine.EventSystems;
 using System;
 
-[Serializable]
-public struct RoomPosition
-{
-	public int x;
-	public int y;
-
-	public RoomPosition Left {
-		get { return new RoomPosition() { x = x - 1, y = y }; }
-	}
-	public RoomPosition Right {
-		get { return new RoomPosition() { x = x + 1, y = y }; }
-	}
-
-	public Room LeftRoom {
-		get { return GameLogic.RoomByPosition(Left); }
-	}
-	public Room RightRoom {
-		get { return GameLogic.RoomByPosition(Right); }
-	}
-
-	public bool HasLeft()
-	{
-		return GameLogic.RoomByPosition(Left) != null;
-	}
-	public bool HasRight()
-	{
-		return GameLogic.RoomByPosition(Right) != null;
-	}
-
-	public string hash {
-		get { return string.Format("{0}:{1}", x, y); }
-	}
-
-	public override string ToString()
-	{
-		return hash;
-	}
-
-	public override bool Equals(object obj)
-	{
-		return ((RoomPosition)obj).hash.Equals(hash);
-	}
-	public override int GetHashCode()
-	{
-		return 0;
-	}
-
-	public Vector3 Position 
-	{
-		get {
-			return Vector3(this);
-		}
-	}
-
-	#region STATIC
-	public static Vector3 Vector3(RoomPosition pos)
-	{
-		return new Vector3(pos.x * 10, pos.y * -8, 0);
-	}
-	#endregion
-}
 
 
 [ExecuteInEditMode]
@@ -82,51 +21,22 @@ public class Room : MonoBehaviour
 	private RoomType _roomType;
 	public RoomType RoomType;
 
-	private RoomType _type;
-	public RoomType Type {
-		get { return _type; }
+	private LightSwitch _lightSwitch;
+	public LightSwitch lightSwitch;
+	public LightSwitch LightSwitch {
+		get { return lightSwitch; }
 		set {
-			_type = value;
-
-			if (Device)
-			{
-				Destroy(Device.gameObject);
-			}
-		
-			if (_type == RoomType.NONE) return;
-
-			Device = RoomDevice.Create(_type, transform, Position);
-			Device.LightsOn = _lightsOn;
-		}
-	}
-
-	private bool _lightsOn = true;
-	public bool LightsOn
-	{
-		get { return _lightsOn; }
-		set
-		{
-			//if (_lightsOn == value) return;
-
-			_lightsOn = value;
 			if (Lights)
 			{
-				Lights.SetActive(_lightsOn);
+				Lights.SetActive(lightSwitch == LightSwitch.On);
 			}
-			if (Device)
-			{
-				Device.LightsOn = _lightsOn;
-			}
-
 		}
 	}
 
 	private bool _selected;
-	public bool Selected
-	{
+	public bool Selected {
 		get { return _selected; }
-		set
-		{
+		set {
 			_selected = value;
 			SelectedObject.SetActive(_selected);
 		}
@@ -150,10 +60,33 @@ public class Room : MonoBehaviour
 
 		result.Position.x = x;
 		result.Position.y = y;
-		result.Type = type;
-
 
 		return result;
+	}
+
+	public void Awake()
+	{
+		GameLogic.Rooms.Add(this);
+	}
+
+	public static Room GetRoom(RoomPosition pos)
+	{
+		return GetRoom(pos.x, pos.y);
+	}
+
+	public static Room GetRoom(int x, int y)
+	{
+		Room[] rooms = FindObjectsOfType<Room>();
+
+		foreach (Room room in rooms)
+		{
+			if (room.Position.Equals(x, y))
+			{
+				return room;
+			}
+		}
+
+		return null;
 	}
 
 	// Use this for initialization
@@ -162,6 +95,12 @@ public class Room : MonoBehaviour
 		transform.position = RoomPosition.Vector3(Position);
 		SetWalls();
 	}
+
+	public void OnDestroy()
+	{
+		GameLogic.Rooms.Remove(this);
+	}
+
 
 	// Update is called once per frame
 	void Update()
@@ -175,7 +114,13 @@ public class Room : MonoBehaviour
 			SetWalls();
 		}
 
-		if (!Application.isPlaying) return;
+		if (lightSwitch != _lightSwitch)
+		{
+			_lightSwitch = lightSwitch;
+			LightSwitch = _lightSwitch;
+		}
+
+		//if (!Application.isPlaying) return;
 
 
 
@@ -198,7 +143,7 @@ public class Room : MonoBehaviour
 			case 0:
 				Walls[0].SetActive(true);
 				Walls[2].SetActive(true);
-			break;
+				break;
 			case 1:
 				Walls[1].SetActive(true);
 				Walls[2].SetActive(true);
@@ -208,7 +153,7 @@ public class Room : MonoBehaviour
 				break;
 			case 3:
 				Walls[1].SetActive(true);
-			break;
+				break;
 		}
 
 		Walls[3].SetActive(RoomType != RoomType.ELEVATOR);
@@ -223,8 +168,11 @@ public class Room : MonoBehaviour
 	void OnMouseUp()
 	{
 		if (EventSystem.current.IsPointerOverGameObject()) return;
-		Debug.Log("room click at:" + Position);
+		//Debug.Log("click: " + this);
 		GameLogic.SelectedRoom = this;
 	}
-
+	public override string ToString()
+	{
+		return "room @ x:" + Position.x + " y:" + Position.y + " type:" + RoomType;
+	}
 }

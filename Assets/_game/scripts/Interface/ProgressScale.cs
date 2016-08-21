@@ -28,7 +28,7 @@ public class ProgressScale : ProgressBar
 
 	void Start()
 	{
-		Value = 0;
+		Value = Test;
 	}
 
 	void Update()

@@ -14,6 +14,12 @@ public enum RoomType
 	ELEVATOR,
 }
 
+public enum LightSwitch
+{
+	On,
+	Off
+}
+
 public struct P
 {
 	private float value;
@@ -129,6 +135,75 @@ public class RoomProperty
 	}
 }
 
+[Serializable]
+public struct RoomPosition
+{
+	public int x;
+	public int y;
+
+	public RoomPosition Left {
+		get { return new RoomPosition() { x = x - 1, y = y }; }
+	}
+	public RoomPosition Right {
+		get { return new RoomPosition() { x = x + 1, y = y }; }
+	}
+
+	public Room LeftRoom {
+		get { return GameLogic.RoomByPosition(Left); }
+	}
+	public Room RightRoom {
+		get { return GameLogic.RoomByPosition(Right); }
+	}
+
+	public bool HasLeft()
+	{
+		return GameLogic.RoomByPosition(Left) != null;
+	}
+	public bool HasRight()
+	{
+		return GameLogic.RoomByPosition(Right) != null;
+	}
+
+	public string hash {
+		get { return Hash(x, y); }
+	}
+
+	public override string ToString()
+	{
+		return hash;
+	}
+	public bool Equals(int x, int y) 
+	{
+		return hash.Equals(Hash(x,y));
+	}
+
+	public override bool Equals(object obj)
+	{
+		return ((RoomPosition)obj).hash.Equals(hash);
+	}
+
+	public override int GetHashCode()
+	{
+		return 0;
+	}
+
+	public Vector3 Position {
+		get {
+			return Vector3(this);
+		}
+	}
+
+	#region STATIC
+	public static Vector3 Vector3(RoomPosition pos)
+	{
+		return new Vector3(pos.x * 10, pos.y * -8, 0);
+	}
+	public static string Hash(int x, int y) 
+	{
+		return string.Format("{0}:{1}", x, y);
+	}
+	#endregion
+}
 
 public static class  Cave
 {

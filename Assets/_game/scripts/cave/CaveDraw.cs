@@ -42,7 +42,7 @@ public class CaveDraw : MonoBehaviour
 		Y = yb;
 
 		if (Bottom) Bottom.position = new Vector3(0, Y * -8);
-		if (Left) Left.position = new Vector3(XLeft * -10, 0);
+		if (Left) Left.position = new Vector3(XLeft * 10, 0);
 		if (Right) Right.position = new Vector3(XRight * 10, 0);
 
 	}
