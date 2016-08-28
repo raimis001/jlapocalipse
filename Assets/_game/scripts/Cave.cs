@@ -14,6 +14,12 @@ public enum RoomType
 	ELEVATOR,
 }
 
+public enum RoomStatus
+{
+	Building,
+	Ready
+}
+
 public enum LightSwitch
 {
 	On,
@@ -197,6 +203,11 @@ public struct RoomPosition
 	public static Vector3 Vector3(RoomPosition pos)
 	{
 		return new Vector3(pos.x * 10, pos.y * -8, 0);
+	}
+
+	public static string Hash(RoomPosition pos)
+	{
+		return Hash(pos.x, pos.y);
 	}
 	public static string Hash(int x, int y) 
 	{

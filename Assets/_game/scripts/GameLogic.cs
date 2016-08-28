@@ -30,6 +30,7 @@ public class GameLogic : MonoBehaviour
 
 		room.Weight = weight;
 
+		Pathfinder.Prepare();
 	}
 
 	public delegate void RoomSelect(Room room);
@@ -41,14 +42,16 @@ public class GameLogic : MonoBehaviour
 		get { return _selectedRoom; }
 		set
 		{
+			if (_selectedRoom == value)
+			{
+				return;
+			}
 			if (_selectedRoom)
 			{
 				_selectedRoom.Selected = false;
 				if (!value || _selectedRoom.Position.ToString().Equals(value.Position.ToString()))
 				{
 					_selectedRoom = null;
-					Instance.BuildMenu.SetActive(true);
-					Instance.RoomMenu.SetActive(false);
 					if (OnRoomSelect != null) OnRoomSelect(null);
 					return;
 				}
@@ -59,8 +62,6 @@ public class GameLogic : MonoBehaviour
 			{
 				_selectedRoom.Selected = true;
 			}
-			Instance.BuildMenu.SetActive(!_selectedRoom);
-			Instance.RoomMenu.SetActive(_selectedRoom);
 			if (OnRoomSelect != null) OnRoomSelect(_selectedRoom);
 
 		}
@@ -78,10 +79,6 @@ public class GameLogic : MonoBehaviour
 
 	public GameObject[] Items;
 
-	[Header("Interface")]
-	public GameObject BuildMenu;
-	public GameObject RoomMenu;
-
 	[Header("Test")]
 	public Text OxigeGen;
 	public GridDraw PathDrawer;
@@ -94,10 +91,6 @@ public class GameLogic : MonoBehaviour
 
 	void Start()
 	{
-		//CreateRoom(new RoomPosition());
-		BuildMenu.SetActive(true);
-		RoomMenu.SetActive(false);
-
 		Pathfinder.Prepare();
 		PathDrawer.DrawGrid();
 	}
@@ -106,6 +99,13 @@ public class GameLogic : MonoBehaviour
 	{
 		Cave.Update();
 		OxigeGen.text = Cave.Storage.Oxigen.ToString();
+
+		if (Input.GetMouseButtonUp(1))
+		{
+			Build.Clear();
+			Gui.SelectedObject = null;
+		}
+
 	}
 
 	public static BarValues GetValues() {
@@ -170,5 +170,34 @@ public class GameLogic : MonoBehaviour
 		}
 
 		return null;
+	}
+
+	public static void CreateBuildLocations()
+	{
+		Room[] rooms = FindObjectsOfType<Room>();
+
+		List<string> roomList = new List<string>();
+		foreach (Room room in rooms)
+		{
+			roomList.Add(room.Position.hash);
+		}
+
+		Build.Clear();
+		foreach (Room room in rooms)
+		{
+			//TODO: look left and right
+			string test = RoomPosition.Hash(room.Position.x - 1, room.Position.y);
+			if (!roomList.Contains(test))
+			{
+				Build.Create(room.Position.x - 1, room.Position.y);
+			}
+			test = RoomPosition.Hash(room.Position.x + 1, room.Position.y);
+			if (!roomList.Contains(test))
+			{
+				Build.Create(room.Position.x + 1, room.Position.y);
+			}
+		}
+
+
 	}
 }

@@ -29,7 +29,7 @@ public class CameraManager : MonoBehaviour
 
 		if (Input.GetMouseButton(2))
 		{
-			Vector3 delta = (_dragg - Input.mousePosition) * 0.3f;
+			Vector3 delta = (_dragg - Input.mousePosition) * 0.1f;
 			MoveMe(delta.x, delta.y, 0);
 			_dragg = Input.mousePosition;
 			return;

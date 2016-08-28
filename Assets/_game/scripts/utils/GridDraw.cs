@@ -55,7 +55,6 @@ public class GridDraw : MonoBehaviour
 			endRoom = room;
 		}
 
-		CaveNode pos;
 
 		if (startRoom && endRoom) 
 		{
@@ -66,17 +65,6 @@ public class GridDraw : MonoBehaviour
 				Cells[g.x, g.y].GetComponent<SpriteRenderer>().color = Color.green;
 			}
 
-		}
-
-		if (startRoom)
-		{
-			pos = path.GetNode(startRoom.Position.x, startRoom.Position.y);
-			//Cells[pos.x, pos.y].GetComponent<SpriteRenderer>().color = Color.yellow;
-		}
-		if (endRoom)
-		{
-			pos = path.GetNode(endRoom.Position.x, endRoom.Position.y);
-			//Cells[pos.x, pos.y].GetComponent<SpriteRenderer>().color = Color.blue;
 		}
 
 	}

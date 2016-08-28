@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Build : MonoBehaviour
 {
 
-	public static Build CreateBuild(RoomPosition pos)
+	private static List<Build> _created = new List<Build>();
+	 
+	public static Build Create(RoomPosition pos)
 	{
-		return CreateBuild(pos.x, pos.y);
+		return Create(pos.x, pos.y);
 	}
-	public static Build CreateBuild(int x, int y)
+	public static Build Create(int x, int y)
 	{
 		GameObject obj = Instantiate(GameLogic.Instance.BuildPrefab);
 		Build build = obj.GetComponent<Build>();
@@ -16,10 +19,21 @@ public class Build : MonoBehaviour
 		build.Position.x = x;
 		build.Position.y = y;
 
+		_created.Add(build);
+
 		return build;
 	}
 
-	public RoomPosition Position = new RoomPosition();
+	public static void Clear()
+	{
+		foreach (Build build in _created)
+		{
+			Destroy(build.gameObject);
+		}
+		_created.Clear();
+	}
+
+	public RoomPosition Position;
 
 	// Use this for initialization
 	void Start()
@@ -36,5 +50,6 @@ public class Build : MonoBehaviour
 	void OnMouseUp()
 	{
 		GameLogic.CreateRoom(Position);
+		Clear();
 	}
 }

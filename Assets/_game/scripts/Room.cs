@@ -46,6 +46,13 @@ public class Room : MonoBehaviour
 	public RoomPosition Position;
 
 	internal RoomDevice Device;
+	
+	[Header("Building")]
+	public RoomStatus RoomSatus;
+	public GameObject BuildObject;
+	public ProgressBar BuildProgress;
+	internal float BuildProgressValue;
+	public GameObject Decoration;
 
 	public static Room CreateRoom(RoomPosition pos, RoomType type)
 	{
@@ -61,12 +68,10 @@ public class Room : MonoBehaviour
 		result.Position.x = x;
 		result.Position.y = y;
 
-		return result;
-	}
+		result.RoomSatus = RoomStatus.Building;
+		result.BuildProgress.Value = 1;
 
-	public void Awake()
-	{
-		GameLogic.Rooms.Add(this);
+		return result;
 	}
 
 	public static Room GetRoom(RoomPosition pos)
@@ -89,11 +94,26 @@ public class Room : MonoBehaviour
 		return null;
 	}
 
-	// Use this for initialization
+
+	public void Awake()
+	{
+		GameLogic.Rooms.Add(this);
+	}
+
 	void Start()
 	{
 		transform.position = RoomPosition.Vector3(Position);
 		SetWalls();
+
+		if (RoomSatus == RoomStatus.Building)
+		{
+			BuildProgress.Value = 1;
+			BuildProgressValue = 1;
+			BuildObject.SetActive(true);
+			Decoration.SetActive(false);
+			lightSwitch = LightSwitch.Off;
+
+		}
 	}
 
 	public void OnDestroy()
@@ -101,8 +121,6 @@ public class Room : MonoBehaviour
 		GameLogic.Rooms.Remove(this);
 	}
 
-
-	// Update is called once per frame
 	void Update()
 	{
 		if (Weight != _weight || _roomType != RoomType || !_position.Equals(Position))
@@ -120,10 +138,12 @@ public class Room : MonoBehaviour
 			LightSwitch = _lightSwitch;
 		}
 
-		//if (!Application.isPlaying) return;
+		if (!Application.isPlaying) return;
 
-
-
+		if (RoomSatus == RoomStatus.Building)
+		{
+			SetBuildProgress();
+		}
 	}
 
 	void SetWalls()
@@ -163,6 +183,34 @@ public class Room : MonoBehaviour
 		transform.position = RoomPosition.Vector3(Position);
 
 		CaveDraw.LastRoomCount = 0;
+	}
+
+	void SetBuildProgress()
+	{
+		if (BuildProgressValue > 0.2f)
+		{
+			BuildProgress.Value = (BuildProgressValue - 0.2f) / 0.8f;
+			return;
+		}
+
+		if (BuildProgressValue < 0.15f)
+		{
+			lightSwitch = LightSwitch.On;
+		}
+		if (BuildProgressValue < 0.07f)
+		{
+			Decoration.SetActive(true);
+		}
+
+	}
+
+	public void EndBuild()
+	{
+		BuildObject.SetActive(false);
+		lightSwitch = LightSwitch.On;
+		Decoration.SetActive(true);
+
+		RoomSatus = RoomStatus.Ready;
 	}
 
 	void OnMouseUp()

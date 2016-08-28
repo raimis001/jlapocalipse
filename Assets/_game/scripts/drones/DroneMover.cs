@@ -3,11 +3,18 @@ using System.Collections;
 using Engine.Pathfinder;
 using System.Collections.Generic;
 
+public enum DroneStatus
+{
+	None,
+	Move,
+	Working
+}
+
 public class DroneMover : MonoBehaviour
 {
-	public Vector3[] RoomPoints;
 	public Room CurrentRoom;
 	public GameObject EffectWork;
+	public raWaypointPath Waypoints;
 
 	private Room TargetRoom;
 
@@ -16,6 +23,10 @@ public class DroneMover : MonoBehaviour
 
 	private bool _moving;
 	private bool _break;
+	private int _waypoint;
+
+	public DroneStatus Status;
+
 
 	public void OnDisable()
 	{
@@ -26,143 +37,190 @@ public class DroneMover : MonoBehaviour
 	{
 		GameLogic.OnRoomSelect += OnRoomSelect;
 	}
+
 	public void Start()
 	{
-		/*
-		if (RoomPoints.Length > 0) 
-		{
-			Droid.localPosition = RoomPoints[0];
-			StartCoroutine(Move());
-		}
-		*/
+		SetCurrentRoom(CurrentRoom,0);
+	}
 
+	void SetCurrentRoom(Room room, int waypoint)
+	{
+		CurrentRoom = room;
 		transform.SetParent(CurrentRoom.transform);
 		transform.localPosition = Vector3.zero;
 
-		//StartCoroutine(MoveToRoom());
-
+		Droid.transform.localPosition = Waypoints.localPosition(waypoint);
+		_waypoint = waypoint;
 	}
 
-	void OnRoomSelect(Room room) 
+
+	void OnRoomSelect(Room room)
 	{
-		
-		if (room == null) 
+		if (!room || room == CurrentRoom || Status != DroneStatus.None)
 		{
-			TargetRoom = null;
 			return;
 		}
 
-		TargetRoom = room;
-
-		//TODO find path and move
-		//Debug.Log("Finding path");
-		EffectWork.SetActive(false);
-		List<GridNode> path = GameLogic.Pathfinder.FindPath(CurrentRoom.Position, TargetRoom.Position);
-		
+		List<GridNode> path = GameLogic.Pathfinder.FindPath(CurrentRoom.Position, room.Position);
+		if (path.Count < 1)
+		{
+			return;
+		}
 		GameLogic.Instance.PathDrawer.FillPath(path);
-		
+	
 		StartCoroutine(MoveByPath(path));
 	}
 
-	void StartWorking() 
+	void StartWorking(Room work)
+	{
+		StartCoroutine(DoWorking(work));
+	}
+
+	IEnumerator DoWorking(Room work)
 	{
 		EffectWork.SetActive(true);
-	}
-	bool elevator = false;
-	IEnumerator MoveByPath(List<GridNode> path) 
-	{
-		if (path.Count < 1)
+		Status = DroneStatus.Working;
+
+		while (work.BuildProgressValue > 0)
 		{
-			//Debug.Log("No path");
+			yield return null;
+			work.BuildProgressValue -= Time.smoothDeltaTime / 3f;
+		}
+		work.EndBuild();
+
+		EffectWork.SetActive(false);
+
+		yield return MoveToRoom(work);
+		yield return Move(1);
+
+		Status = DroneStatus.None;
+
+
+	}
+
+	IEnumerator StopWorking()
+	{
+		EffectWork.SetActive(false);
+		if (Status != DroneStatus.Working)
+		{
 			yield break;
 		}
 
-		if (Vector3.Distance(transform.position, RoomPoints[1]) > 0.5) 
-		{
-			//Debug.Log("Goto begin point");
-			yield return Move(RoomPoints[1], 1);
-		}
-
-		foreach (GridNode node in path) 
-		{
-			if (!node.reference) 
-			{
-				//Go to elevator
-				Debug.Log("goto elevator");
-				if (!elevator)
-				{
-					yield return MoveToElevator();
-				}
-				continue;
-			}
-			Room next = node.reference.GetComponent<Room>();
-			int direction;
-			if (next.Position.y != CurrentRoom.Position.y)
-			{
-				//Go up or down
-				Debug.Log("Need to climb or down");
-
-				direction = next.Position.y < CurrentRoom.Position.y ? 0 : 1;
-
-				if (direction == 0)
-				{
-					Debug.Log("climb UP");
-					yield return Move(RoomPoints[6], 2);
-				}
-
-				Debug.Log("set new room");
-				CurrentRoom = next;
-				transform.SetParent(CurrentRoom.transform);
-				transform.localPosition = Vector3.zero;
-
-				if (direction == 0)
-				{
-					Debug.Log("set new position after climb");
-					Droid.transform.localPosition = RoomPoints[4];
-				}
-				else 
-				{
-					Debug.Log("Clib down");
-					Droid.transform.localPosition = RoomPoints[6];
-					yield return Move(RoomPoints[4], 1);
-					elevator = true;
-				}
-
-				continue;
-			}
-			if (elevator) 
-			{
-				Debug.Log("Move from stairs");
-				yield return Move(RoomPoints[5], 1);
-				elevator = false;
-			}
-
-			direction = next.Position.x < CurrentRoom.Position.x ? 0 : 1;
-
-			Vector3 fStep = direction == 0 ? RoomPoints[3] : RoomPoints[2];
-			
-			//Debug.Log("Goto first randevu");
-			yield return Move(fStep, 2);
-
-			CurrentRoom = next;
-			transform.SetParent(CurrentRoom.transform);
-			transform.localPosition = Vector3.zero;
-			Droid.transform.localPosition = direction == 0 ? RoomPoints[2] : RoomPoints[3];
-			//yield break;
-		}
-
-		yield return Move(RoomPoints[1], 1);
-		yield return Move(RoomPoints[0], 1);
-		StartWorking();
+		yield return Move(0);
+		Status = DroneStatus.None;
 	}
 
-	IEnumerator MoveToElevator() 
+	IEnumerator MoveToStreet()
 	{
-		yield return Move(RoomPoints[5], 1);
-		yield return Move(RoomPoints[4], 1);
+		if (_waypoint > 0)
+		{
+			yield break;
+		}
+
+		yield return Move(1);
+
 	}
 
-	IEnumerator Move(Vector3 positionTo, float time)
+	IEnumerator MoveToRoom(Room next)
+	{
+	
+		yield return MoveToStreet();
+
+		if (next.Position.y != CurrentRoom.Position.y)
+		{
+			//Going up or down
+			if (next.Position.y < CurrentRoom.Position.y)
+			{
+				//Going up
+				yield return Move(8);
+				SetCurrentRoom(next, 7);
+			}
+			else
+			{
+				SetCurrentRoom(next, 8);
+				yield return Move(7);
+			}
+			yield break;
+		}
+
+		if (_waypoint == 7)
+		{
+			yield return Move(6);
+		}
+
+
+		int direction = next.Position.x < CurrentRoom.Position.x ? 2 : 3;
+
+		yield return Move(direction);
+
+		if (next.RoomSatus == RoomStatus.Building)
+		{
+			Debug.Log("This room is need to build");
+			StartWorking(next);
+			yield break;
+		}
+
+		direction = direction == 2 ? 5 : 4;
+		SetCurrentRoom(next, direction);
+
+
+		direction = direction == 5 ? 3 : 2;
+		yield return Move(direction);
+
+	}
+	IEnumerator MoveToElevator()
+	{
+		if (_waypoint == 7)
+		{
+			yield break;
+		}
+
+		if (_waypoint != 6)
+		{
+			yield return Move(6);
+		}
+
+		yield return Move(7);
+	}
+
+	IEnumerator MoveByPath(List<GridNode> path)
+	{
+		Status = DroneStatus.Move;
+		yield return StopWorking();
+
+		foreach (GridNode node in path)
+		{
+			if (!node.reference)
+			{
+				yield return MoveToElevator();
+				continue;
+			}
+
+			Room next = node.reference.GetComponent<Room>();
+			yield return MoveToRoom(next);
+		}
+
+		if (_waypoint == 7)
+		{
+			yield return Move(6);
+		}
+
+		if (Status == DroneStatus.Working)
+		{
+			yield break;
+		}
+
+		yield return Move(1);
+		Status = DroneStatus.None;
+	}
+
+	IEnumerator Move(int waypoint)
+	{
+		yield return Move(Waypoints.localPosition(waypoint));
+		_waypoint = waypoint;
+	}
+
+	IEnumerator Move(Vector3 positionTo)
 	{
 		if (_moving)
 		{
@@ -178,9 +236,9 @@ public class DroneMover : MonoBehaviour
 			StartCoroutine(RotateBody(angle));
 		}
 
-		float delta = Vector3.Distance(positionFrom, positionTo) / 1.5f;
+		float delta = Vector3.Distance(positionFrom, positionTo) / 2.5f;
 		//Debug.Log(delta);
-		time = delta;
+		float time = delta;
 
 		while (deltaTime < time)
 		{
@@ -229,8 +287,4 @@ public class DroneMover : MonoBehaviour
 
 	}
 
-	public void OnMouseUp()
-	{
-		Debug.Log("Click on droid");
-	}
 }
