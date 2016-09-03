@@ -3,12 +3,12 @@ using System.Collections;
 
 public class Character : MonoBehaviour
 {
-	public Inventory Inventory;
+	//public Inventory Inventory;
 
 	// Use this for initialization
 	void Start()
 	{
-		Inventory.gameObject.SetActive(false);
+		//Inventory.gameObject.SetActive(false);
 	}
 
 	// Update is called once per frame
@@ -17,16 +17,16 @@ public class Character : MonoBehaviour
 		if (Input.GetMouseButtonUp(1))
 		{
 			ItemMain item = ItemMain.Create(Helper.GetRandomEnum<ItemKind>());
-			if (!Inventory.AddItem(item))
+			//if (!Inventory.AddItem(item))
 			{
-				Destroy(item.gameObject);
+				//Destroy(item.gameObject);
 			}
 		}
 	}
 
 	public void OnMouseUp()
 	{
-		Inventory.gameObject.SetActive(!Inventory.gameObject.activeSelf);
+		//Inventory.gameObject.SetActive(!Inventory.gameObject.activeSelf);
 	}
 
 

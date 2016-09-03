@@ -14,13 +14,12 @@ public class ItemMain : MonoBehaviour
 	public Text ValueText;
 
 	public ItemKind ItemKind;
-	public InventoryKey Inventory;
 
 	public int Value = 10;
 
 	public void ResetPosition()
 	{
-		transform.localPosition = Inventory.Position();
+		//transform.localPosition = Inventory.Position();
 	}
 
 	public void Update()
@@ -38,7 +37,7 @@ public class ItemMain : MonoBehaviour
 		Debug.Log(" mouse up Item:" + ItemKind);
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit[] hits = Physics.RaycastAll(ray);
-
+		/*
 		foreach (RaycastHit hit in hits)
 		{
 			if (hit.collider.gameObject.GetComponent<Inventory>())
@@ -50,7 +49,7 @@ public class ItemMain : MonoBehaviour
 				}
 			}
 		}
-
+		*/
 		ResetPosition();
 	}
 
@@ -63,6 +62,7 @@ public class ItemMain : MonoBehaviour
 
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit[] hits = Physics.RaycastAll(ray);
+		/*
 		foreach (RaycastHit hit in hits)
 		{
 			if (hit.collider.gameObject.GetComponent<Inventory>())
@@ -73,6 +73,7 @@ public class ItemMain : MonoBehaviour
 				break;
 			}
 		}
+		*/
 		Vector3 pos_move = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
 
 		transform.position = new Vector3(pos_move.x - 0.25f, pos_move.y - 0.0f, z);

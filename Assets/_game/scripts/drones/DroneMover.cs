@@ -26,8 +26,7 @@ public class DroneMover : MonoBehaviour
 	private int _waypoint;
 
 	public DroneStatus Status;
-
-
+	
 	public void OnDisable()
 	{
 		GameLogic.OnRoomSelect -= OnRoomSelect;
@@ -43,6 +42,23 @@ public class DroneMover : MonoBehaviour
 		SetCurrentRoom(CurrentRoom,0);
 	}
 
+	public void MoveToRoom(Room room)
+	{
+		List<GridNode> path = GameLogic.Pathfinder.FindPath(CurrentRoom.Position, room.Position);
+		if (path.Count < 1)
+		{
+			return;
+		}
+		GameLogic.Instance.PathDrawer.FillPath(path);
+
+		StartCoroutine(MoveByPath(path));
+	}
+
+	public void MoveToCharger(DeviceCharger charger)
+	{
+		StartCoroutine(IEMoveToCharger(charger));
+	}
+
 	void SetCurrentRoom(Room room, int waypoint)
 	{
 		CurrentRoom = room;
@@ -53,24 +69,16 @@ public class DroneMover : MonoBehaviour
 		_waypoint = waypoint;
 	}
 
-
 	void OnRoomSelect(Room room)
 	{
 		if (!room || room == CurrentRoom || Status != DroneStatus.None)
 		{
 			return;
 		}
-
-		List<GridNode> path = GameLogic.Pathfinder.FindPath(CurrentRoom.Position, room.Position);
-		if (path.Count < 1)
-		{
-			return;
-		}
-		GameLogic.Instance.PathDrawer.FillPath(path);
-	
-		StartCoroutine(MoveByPath(path));
+		MoveToRoom(room);
 	}
 
+#region WORKING
 	void StartWorking(Room work)
 	{
 		StartCoroutine(DoWorking(work));
@@ -90,7 +98,7 @@ public class DroneMover : MonoBehaviour
 
 		EffectWork.SetActive(false);
 
-		yield return MoveToRoom(work);
+		yield return IEMoveToRoom(work);
 		yield return Move(1);
 
 		Status = DroneStatus.None;
@@ -109,8 +117,20 @@ public class DroneMover : MonoBehaviour
 		yield return Move(0);
 		Status = DroneStatus.None;
 	}
+	#endregion
 
-	IEnumerator MoveToStreet()
+#region MOVE INTERFACE
+	IEnumerator IEMoveToCharger(DeviceCharger charger)
+	{
+		Room room = charger.ParentRoom;
+		List<GridNode> path = GameLogic.Pathfinder.FindPath(CurrentRoom.Position, room.Position);
+
+		yield return MoveByPath(path);
+
+		yield return Move(charger.Waypoint);
+	}
+
+	IEnumerator IEMoveToStreet()
 	{
 		if (_waypoint > 0)
 		{
@@ -121,10 +141,10 @@ public class DroneMover : MonoBehaviour
 
 	}
 
-	IEnumerator MoveToRoom(Room next)
+	IEnumerator IEMoveToRoom(Room next)
 	{
 	
-		yield return MoveToStreet();
+		yield return IEMoveToStreet();
 
 		if (next.Position.y != CurrentRoom.Position.y)
 		{
@@ -163,11 +183,11 @@ public class DroneMover : MonoBehaviour
 		direction = direction == 2 ? 5 : 4;
 		SetCurrentRoom(next, direction);
 
-
 		direction = direction == 5 ? 3 : 2;
 		yield return Move(direction);
 
 	}
+
 	IEnumerator MoveToElevator()
 	{
 		if (_waypoint == 7)
@@ -197,7 +217,7 @@ public class DroneMover : MonoBehaviour
 			}
 
 			Room next = node.reference.GetComponent<Room>();
-			yield return MoveToRoom(next);
+			yield return IEMoveToRoom(next);
 		}
 
 		if (_waypoint == 7)
@@ -212,6 +232,13 @@ public class DroneMover : MonoBehaviour
 
 		yield return Move(1);
 		Status = DroneStatus.None;
+	}
+#endregion
+
+#region MOVE/ROTATE
+	IEnumerator Move(raWaypoint waypoint)
+	{
+		yield return Move(waypoint.transform.localPosition);
 	}
 
 	IEnumerator Move(int waypoint)
@@ -286,5 +313,12 @@ public class DroneMover : MonoBehaviour
 		Body.localEulerAngles = new Vector3(0, angle, 0);
 
 	}
+#endregion
+
+#region CHARGE
+
+
+
+#endregion
 
 }

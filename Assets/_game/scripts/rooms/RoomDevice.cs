@@ -9,8 +9,6 @@ public class RoomDevice : MonoBehaviour
 	public RoomPosition Position;
 	public Light Power;
 
-	public Inventory Inventory;
-
 	private bool _lightsOn = true;
 	public bool LightsOn {
 		get { return _lightsOn; }
@@ -37,9 +35,23 @@ public class RoomDevice : MonoBehaviour
 
 	public BarValues Values;
 
+	internal Room ParentRoom
+	{
+		get
+		{
+			return GetComponentInParent<Room>();
+		}
+	}
+
 	protected virtual void Start()
 	{
-		if (Inventory) Inventory.OnChange = InventoryChanged;
+		//if (Inventory) Inventory.OnChange = InventoryChanged;
+
+		Room room = GetComponentInParent<Room>();
+		if (room)
+		{
+			Debug.Log("Device " + gameObject.name + " in room:" + room.gameObject.name);
+		}
 	}
 
 	protected virtual void Update()
@@ -61,7 +73,7 @@ public class RoomDevice : MonoBehaviour
 	public virtual void EndDrag(ItemMain item)
 	{
 		Debug.Log("End dragging item:" + item.ItemKind);
-
+		/*
 		if (!Inventory)
 		{
 			item.ResetPosition();
@@ -72,6 +84,7 @@ public class RoomDevice : MonoBehaviour
 		{
 			item.ResetPosition();
 		}
+		*/
 	}
 
 	private void InventoryChanged()

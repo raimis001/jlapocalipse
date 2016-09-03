@@ -22,7 +22,7 @@ public class RoomFood : RoomDevice
 	public float MealNeed = 4;
 	private float _mealTime;
 
-	public InventoryClass FoodInventory;
+	//public InventoryClass FoodInventory;
 
 	protected override void Start()
 	{
@@ -66,7 +66,7 @@ public class RoomFood : RoomDevice
 
 	void MakeMeal() {
 		if (MealCount < MealNeed) return;
-		if (FoodInventory.Count >= 2) return;
+		//if (FoodInventory.Count >= 2) return;
 
 		MealCount -= MealNeed;
 		DropItem();
@@ -82,7 +82,7 @@ public class RoomFood : RoomDevice
 	void DropItem()
 	{
 		ItemMain item = ItemMain.Create(ItemKind.Food);
-		FoodInventory.AddItem(item);
+		//FoodInventory.AddItem(item);
 
 		item.transform.position = DropPoint.position;
 		Animator.SetTrigger("Work");

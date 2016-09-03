@@ -19,10 +19,12 @@ public class RoomHydrophonic : RoomDevice
 	protected override void Start()
 	{
 		base.Start();
+		/*
 		if (Inventory)
 		{
 			Inventory.gameObject.SetActive(false);
 		}
+		*/
 	}
 
 	protected override void Update()
@@ -39,14 +41,17 @@ public class RoomHydrophonic : RoomDevice
 
 	public void OnMouseUp()
 	{
+		/*
 		if (Inventory)
 		{
 			Inventory.gameObject.SetActive(!Inventory.gameObject.activeSelf);
 		}
+		*/
 	}
 
 	void CheckInventory()
 	{
+		/*
 		if (!Inventory || Inventory.Items.Count < 1) return;
 		if (WaterStore >= WaterMax) return;
 
@@ -58,6 +63,7 @@ public class RoomHydrophonic : RoomDevice
 			Inventory.RemoveItem(item, true);
 			break;
 		}
+		*/
 	}
 
 	void ChekVagas()

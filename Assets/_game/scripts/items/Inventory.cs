@@ -1,163 +1,133 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-[Serializable]
-public struct InventoryKey
+public class InventoryItem
 {
-	public string Id;
-	public Inventory Parent;
+	public int parentId;
+	public ItemKind item;
+	public int count;
 
-	public Vector3 Position()
-	{
-		return Parent ? Parent.CellPosition(Id) : Vector3.zero;
-	}
 }
 
-public delegate void ChangeInventory();
-
-[Serializable]
-public class InventoryClass 
+public class Inventory
 {
-	public Dictionary<string, ItemMain> Items = new Dictionary<string, ItemMain>();
+	private static int StoredId = 0;
+	private static Dictionary<int, Inventory> InventoryList = new Dictionary<int, Inventory>();
 
-	public int SizeX = 3;
-	public int SizeY = 3;
+	public delegate void InventoryChange();
+	public event InventoryChange OnChange;
 
-	public bool AcceptAll = true;
-	public List<ItemKind> Accept = new List<ItemKind>();
+	public int ID;
+	public int MaxCount = 9;
 
-	public ChangeInventory OnChange;
+	private Dictionary<int, InventoryItem> Items = new Dictionary<int, InventoryItem>();
 
-	public int Count {
+	public Inventory()
+	{
+		ID = StoredId++;
+		InventoryList.Add(ID, this);
+	}
+
+	public int Count
+	{
 		get { return Items.Count; }
 	}
 
-	public void RemoveItem(ItemMain item)
+	private int FreeIndex()
 	{
-		Items.Remove(item.Inventory.Id);
-		if (OnChange != null) OnChange();
-	}
-
-	public string AddItem(ItemMain item)
-	{
-		if (!AcceptAll && !Accept.Contains(item.ItemKind)) return "0";
-
-		string key = FindFree();
-		if (key.Equals("0")) return key;
-
-		Items.Add(key, item);
-		if (OnChange != null) OnChange();
-
-		return key;
-	}
-
-	string FindFree()
-	{
-		string result = "0";
-		for (int i = 0; i < SizeX; i++) {
-			for (int j = 0; j < SizeY; j++) 
+		int i = 0;
+		for (;;)
+		{
+			if (!Items.ContainsKey(i) || Items[i] == null)
 			{
-				string s = i + ":" + j;
-				if (Items.ContainsKey(s)) continue;
-				result = s;
-				break;
+				return i;
+			}
+			i++;
+			if (i >= MaxCount)
+			{
+				return -1;
 			}
 		}
 
-		return result;
+
+	}
+
+	public InventoryItem CreateItem(ItemKind item)
+	{
+		int i = FreeIndex();
+		if (i < 0)
+		{
+			return null;
+		}
+
+		InventoryItem inve = new InventoryItem() {parentId = ID, item = item, count = 1};
+		if (Items.ContainsKey(i))
+		{
+			Items[i] = inve;
+		}
+		else
+		{
+			Items.Add(i, inve);
+		}
+		return inve;
+	}
+
+	public bool AddItem(InventoryItem item)
+	{
+		int i = FreeIndex();
+		if (i < 0)
+		{
+			return false;
+		}
+
+		Inventory inve = null;
+		InventoryList.TryGetValue(item.parentId, out inve);
+		if (inve != null)
+		{
+			inve.RemoveItem(item);
+		}
+
+		item.parentId = ID;
+
+		if (Items.ContainsKey(i))
+		{
+			Items[i] = item;
+		}
+		else
+		{
+			Items.Add(i, item);
+		}
+
+		return true;
 	}
 
 
-	public IEnumerable<ItemMain> GetItems(ItemKind kind)
+	public bool RemoveItem(InventoryItem item)
 	{
-		foreach (ItemMain item in Items.Values)
+		foreach (KeyValuePair<int, InventoryItem> pair in Items)
 		{
-			if (item.ItemKind == kind)
+			if (pair.Value == item)
 			{
-				yield return item;
+				Items.Remove(pair.Key);
+				return true;
 			}
 		}
-	}
-
-}
-
-public class Inventory : MonoBehaviour
-{
-
-	public GameObject[] Cells;
-	public InventoryClass Items = new InventoryClass();
-
-	public ChangeInventory OnChange;
-
-	public bool Visible {
-		get { return gameObject.activeSelf; }
-		set {
-			gameObject.SetActive(value);
-		}
-	}
-
-	public void OnEnable()
-	{
-		for (int i = 0; i < Cells.Length; i++)
-		{
-			int y = Mathf.FloorToInt(i / 3f);
-			int x = i - y * 3;
-			Cells[i].SetActive(x < Items.SizeX && y < Items.SizeY);
-		}
-		BoxCollider collider = GetComponent<BoxCollider>();
-		collider.size = new Vector3(Items.SizeX * 0.5f, Items.SizeY * 0.5f, 0.1f);
-		collider.center = new Vector3(collider.size.x * 0.5f, -collider.size.y * 0.5f + 0.25f, 0.27f);
-
-		Items.OnChange = OnChange;
-	}
-
-	public void RemoveItem(ItemMain item, bool destroy = false)
-	{
-		Items.RemoveItem(item);
-		if (destroy) Destroy(item.gameObject);
-	}
-	
-	public bool AddItem(ItemMain item)
-	{
-		string key = Items.AddItem(item);
-		if (key.Equals("0")) return false;
-		
-		if (item.Inventory.Parent)
-		{
-			item.Inventory.Parent.RemoveItem(item);
-		}
-		item.Inventory.Id = key;
-		item.Inventory.Parent = this;
-
-		item.transform.SetParent(transform);
-		item.transform.localPosition = CellPosition(key);
-
 		return false;
 	}
 
-	int CellId(int x, int y)
+	public void Clear()
 	{
-		return 0;
+		
 	}
 
-	public Vector3 CellPosition(string id)
+	public IEnumerable<InventoryItem> GetItems(ItemKind item)
 	{
-		/*
-		int y = Mathf.FloorToInt(id / 3f);
-		int x = id - y * 3;
-		*/
-
-		string[] s = id.Split(':');
-		if (s.Length < 2) return Vector3.zero;
-
-		int x = int.Parse(s[0]);
-		int y = int.Parse(s[1]);
-
-		return new Vector3(x * 0.5f, y * -0.5f);
+		foreach (InventoryItem value in Items.Values)
+		{
+			if (value.item == item)
+			{
+				yield return value;
+			}
+		}
 	}
-
-
 
 }

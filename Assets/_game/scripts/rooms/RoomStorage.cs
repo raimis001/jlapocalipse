@@ -13,12 +13,12 @@ public class RoomStorage : RoomDevice
 	public Digits7[] Display;
 	public GameObject Sign;
 
-	public Inventory[] Inventorys;
+	//public Inventory[] Inventorys;
 
 	protected override void Start()
 	{
 		base.Start();
-		Inventorys[0].AddItem(ItemMain.Create(ItemKind.Ammo));
+		//Inventorys[0].AddItem(ItemMain.Create(ItemKind.Ammo));
 	}
 
 	protected override void Update()
