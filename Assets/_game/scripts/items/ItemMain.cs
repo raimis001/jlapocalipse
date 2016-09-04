@@ -80,9 +80,16 @@ public class ItemMain : MonoBehaviour
 
 	}
 
-	public static ItemMain Create(ItemKind kind) 
+	public static ItemMain Create(ItemKind kind)
 	{
-		GameObject obj = Instantiate(GameLogic.Instance.Items[(int)kind]);
-		return obj.GetComponent<ItemMain>();
+		if (!GameLogic.Instance) return null;
+		int i = (int) kind;
+		if (GameLogic.Instance.Items.Length < i && GameLogic.Instance.Items[i])
+		{
+
+			GameObject obj = Instantiate(GameLogic.Instance.Items[i]);
+			return obj.GetComponent<ItemMain>();
+		}
+		return null;
 	}
 }
