@@ -35,6 +35,11 @@ public class RoomFood : RoomDevice
 	{
 		base.Update();
 
+		if (!Application.isPlaying)
+		{
+			return;
+		}
+
 		if (RawBar) RawBar.Value = RawCount / RawMax;
 		if (MealBar) MealBar.Value = MealCount / MealMax;
 
@@ -81,10 +86,10 @@ public class RoomFood : RoomDevice
 
 	void DropItem()
 	{
-		ItemMain item = ItemMain.Create(ItemKind.Food);
+		//ItemMain item = ItemMain.Create(ItemKind.Food);
 		//FoodInventory.AddItem(item);
 
-		item.transform.position = DropPoint.position;
-		Animator.SetTrigger("Work");
+		//item.transform.position = DropPoint.position;
+		//Animator.SetTrigger("Work");
 	}
 }

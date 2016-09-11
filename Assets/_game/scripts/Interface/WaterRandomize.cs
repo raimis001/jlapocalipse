@@ -16,47 +16,52 @@ public class WaterRandomize : MonoBehaviour
 		get { return _val; }
 		set
 		{
-			_val = value;
+			_val = value * 0.8f + 0.2f;
 			isBreak = true;
 		}
 	}
 
 	public Transform Water;
+	public Renderer WaterMaterial;
 
 	private bool isTweening;
 	private bool isBreak;
 	private int direction = 1;
-	// Use this for initialization
-	void Start()
-	{
 
-	}
-
-	// Update is called once per frame
 	void Update()
 	{
 
-
-		if (!Application.isPlaying )
+		if (!Application.isPlaying)
 		{
 			if (Math.Abs(Value - val) > 0.001f) Value = val;
+			if (Water)
+			{
+				Water.localScale = new Vector3(Water.localScale.x, Value, Water.localScale.z);
+			}
 		}
-
-		if (Water)
+		else
 		{
-			//Water.localScale = new Vector3(Water.localScale.x, Value, Water.localScale.z);
+			if (WaterMaterial)
+			{
+
+				float offsetX = Mathf.PingPong(Time.time * 0.15f, 2);
+				float offsetY = Mathf.PingPong(Time.time * 0.1f, 2);
+				WaterMaterial.material.SetTextureOffset("_MainTex", new Vector2(offsetX, offsetY));
+			}
+
+			StartCoroutine(Randomize());
+
+			Vector3 rot = transform.localEulerAngles;
+			rot.x = Mathf.PingPong(Time.time*0.08f, 1f) - 0.5f;
+			transform.localEulerAngles = rot;
 		}
 
-		if (!Water || isTweening) return;
-
-
-
-
-		StartCoroutine(Randomize());
 	}
 
 	IEnumerator Randomize()
 	{
+		if (!Water || isTweening) yield break;
+
 		isTweening = true;
 		isBreak = false;
 

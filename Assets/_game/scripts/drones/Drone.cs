@@ -7,7 +7,7 @@ public class Drone : MonoBehaviour
 	internal Inventory Inventory;
 	internal float Energy = 0;
 	internal bool DoCharge;
-	private float ChargeTime = 1f;
+	//private float ChargeTime = 1f;
 	private float ChargeTemp;
 	private const float ChargeValue = 0.3f;
 

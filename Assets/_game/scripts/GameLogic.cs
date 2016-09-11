@@ -78,6 +78,7 @@ public class GameLogic : MonoBehaviour
 	public GameObject[] DevicesPrefab;
 
 	public GameObject[] Items;
+	public GameObject[] Foods;
 
 	[Header("Test")]
 	public Text OxigeGen;
@@ -200,4 +201,18 @@ public class GameLogic : MonoBehaviour
 
 
 	}
+
+#region Prefabs
+
+	public static GameObject GetFood(RawFood food)
+	{
+		if (!Instance) return null;
+
+		int f = (int) food;
+		if (Instance.Foods.Length < 1 || Instance.Foods.Length <= f) return null;
+
+		return Instance.Foods[f];
+	}
+#endregion
+
 }
