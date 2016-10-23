@@ -114,6 +114,7 @@ public class Room : MonoBehaviour
 			lightSwitch = LightSwitch.Off;
 
 		}
+
 	}
 
 	public void OnDestroy()
@@ -223,4 +224,14 @@ public class Room : MonoBehaviour
 	{
 		return "room @ x:" + Position.x + " y:" + Position.y + " type:" + RoomType;
 	}
+
+#region INTERFACE
+
+
+	public void OnCloseRoom()
+	{
+		GameLogic.SelectedRoom = null;
+	}
+#endregion
+
 }

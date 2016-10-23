@@ -29,12 +29,12 @@ public class DroneMover : MonoBehaviour
 	
 	public void OnDisable()
 	{
-		GameLogic.OnRoomSelect -= OnRoomSelect;
+		//GameLogic.OnRoomSelect -= OnRoomSelect;
 	}
 
 	public void OnEnable()
 	{
-		GameLogic.OnRoomSelect += OnRoomSelect;
+		//GameLogic.OnRoomSelect += OnRoomSelect;
 	}
 
 	public void Start()

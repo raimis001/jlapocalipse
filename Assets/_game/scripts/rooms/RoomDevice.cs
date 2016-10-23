@@ -50,7 +50,7 @@ public class RoomDevice : MonoBehaviour
 		Room room = GetComponentInParent<Room>();
 		if (room)
 		{
-			Debug.Log("Device " + gameObject.name + " in room:" + room.gameObject.name);
+			//Debug.Log("Device " + gameObject.name + " in room:" + room.gameObject.name);
 		}
 	}
 

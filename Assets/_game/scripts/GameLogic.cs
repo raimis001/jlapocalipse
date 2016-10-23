@@ -52,6 +52,7 @@ public class GameLogic : MonoBehaviour
 				if (!value || _selectedRoom.Position.ToString().Equals(value.Position.ToString()))
 				{
 					_selectedRoom = null;
+					Instance.CloseInterface();
 					if (OnRoomSelect != null) OnRoomSelect(null);
 					return;
 				}
@@ -61,6 +62,7 @@ public class GameLogic : MonoBehaviour
 			if (_selectedRoom)
 			{
 				_selectedRoom.Selected = true;
+				Instance.OpenInterface();
 			}
 			if (OnRoomSelect != null) OnRoomSelect(_selectedRoom);
 
@@ -80,6 +82,9 @@ public class GameLogic : MonoBehaviour
 	public GameObject[] Items;
 	public GameObject[] Foods;
 
+	[Header("Interface")]
+	public GameObject Interface;
+
 	[Header("Test")]
 	public Text OxigeGen;
 	public GridDraw PathDrawer;
@@ -94,6 +99,7 @@ public class GameLogic : MonoBehaviour
 	{
 		Pathfinder.Prepare();
 		PathDrawer.DrawGrid();
+		CloseInterface();
 	}
 
 	void Update()
@@ -213,6 +219,26 @@ public class GameLogic : MonoBehaviour
 
 		return Instance.Foods[f];
 	}
-#endregion
+	#endregion
 
+#region Interface
+	public void OpenInterface()
+	{
+		if (Interface)
+		{
+			Interface.SetActive(true);
+			Interface.transform.SetParent(SelectedRoom.transform);
+			Interface.transform.localPosition = Vector3.zero;
+		}
+	}
+	public void CloseInterface()
+	{
+		if (Interface) Interface.SetActive(false);
+	}
+
+	public void OnCloseRoom()
+	{
+		SelectedRoom = null;
+	}
+#endregion
 }
