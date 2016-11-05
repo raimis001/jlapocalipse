@@ -1,79 +1,49 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class InventoryShelf : MonoBehaviour
 {
-	/*
-	public GameObject[] Cells;
-	public InventoryClass Items = new InventoryClass();
+	public int Width = 3;
+	public int Height = 3;
 
-	public ChangeInventory OnChange;
+	public GameObject Shelf;
 
-	public bool Visible {
-		get { return gameObject.activeSelf; }
-		set {
-			gameObject.SetActive(value);
-		}
-	}
+	public Transform Follow;
 
-	public void OnEnable()
+	internal Inventory Inventory = new Inventory();
+
+	void Start()
 	{
-		for (int i = 0; i < Cells.Length; i++)
+		if (!Shelf) return;
+
+		int x = 0;
+		int y = 0;
+		foreach (Transform plaukts in Shelf.transform)
 		{
-			int y = Mathf.FloorToInt(i / 3f);
-			int x = i - y * 3;
-			Cells[i].SetActive(x < Items.SizeX && y < Items.SizeY);
+			//Debug.Log(plaukts.name + "x:" + x + " y:" + y);
+			plaukts.gameObject.SetActive(x < Width && y < Height);
+			x++;
+			if (x > Width)
+			{
+				x = 0;
+				y++;
+			}
 		}
-		BoxCollider collider = GetComponent<BoxCollider>();
-		collider.size = new Vector3(Items.SizeX * 0.5f, Items.SizeY * 0.5f, 0.1f);
-		collider.center = new Vector3(collider.size.x * 0.5f, -collider.size.y * 0.5f + 0.25f, 0.27f);
-
-		Items.OnChange = OnChange;
 	}
 
-	public void RemoveItem(ItemMain item, bool destroy = false)
+	void Update()
 	{
-		Items.RemoveItem(item);
-		if (destroy) Destroy(item.gameObject);
-	}
-
-	public bool AddItem(ItemMain item)
-	{
-		string key = Items.AddItem(item);
-		if (key.Equals("0")) return false;
-
-		//if (item.Inventory.Parent)
+		if (Follow)
 		{
-			//item.Inventory.Parent.RemoveItem(item);
+			transform.position = new Vector3(Follow.position.x, Follow.position.y, transform.position.z);
 		}
-		item.Inventory.Id = key;
-		//item.Inventory.Parent = this;
-
-		item.transform.SetParent(transform);
-		item.transform.localPosition = CellPosition(key);
-
-		return false;
 	}
 
-	int CellId(int x, int y)
+	internal bool AddItem(ItemMain itemMain)
 	{
-		return 0;
+		Inventory.AddItem(itemMain);
+		itemMain.transform.SetParent(transform);
+		return true;
 	}
-
-	public Vector3 CellPosition(string id)
-	{
-		int y = Mathf.FloorToInt(id / 3f);
-		int x = id - y * 3;
-	
-
-		string[] s = id.Split(':');
-		if (s.Length < 2) return Vector3.zero;
-
-		int x = int.Parse(s[0]);
-		int y = int.Parse(s[1]);
-
-		return new Vector3(x * 0.5f, y * -0.5f);
-	}
-
-*/
 }

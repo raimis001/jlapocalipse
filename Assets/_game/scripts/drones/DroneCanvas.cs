@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+
 
 public class DroneCanvas : CanvasObject
 {
@@ -14,21 +14,32 @@ public class DroneCanvas : CanvasObject
 		Gui.OpenMenu(1);
 	}
 
+	public override void BuildRoom(Room room)
+	{
+		DroneMover drone = GetComponent<DroneMover>();
+		if (!drone)
+		{
+			return;
+		}
+		drone.MoveToRoom(room);
+	}
+
 	public override void ButtonClick(string tag)
 	{
+		DroneMover drone = GetComponent<DroneMover>();
+		if (!drone)
+		{
+			return;
+		}
+
 		Debug.Log("Button click:" + tag);
 		if (tag.Equals("buildRoom"))
 		{
 			GameLogic.CreateBuildLocations();
+			
 		}
 		else if (tag.Equals("droneCharge"))
 		{
-			DroneMover drone = GetComponent<DroneMover>();
-			if (!drone)
-			{
-				return;
-			}
-
 			DeviceCharger[] chargers = FindObjectsOfType<DeviceCharger>();
 			foreach (DeviceCharger charger in chargers)
 			{
@@ -43,5 +54,8 @@ public class DroneCanvas : CanvasObject
 			Debug.Log("no free chargers");
 
 		}
+		
+
 	}
+
 }

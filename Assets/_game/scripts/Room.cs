@@ -71,6 +71,8 @@ public class Room : MonoBehaviour
 		result.RoomSatus = RoomStatus.Building;
 		result.BuildProgress.Value = 1;
 
+		GameLogic.AddRoom(result.Position, result);
+
 		return result;
 	}
 
@@ -96,12 +98,15 @@ public class Room : MonoBehaviour
 
 
 	public void Awake()
-	{
-		GameLogic.Rooms.Add(this);
+	{	
+		//Debug.Log("Add room " + Position);
+		GameLogic.AddRoom(Position, this);
 	}
 
 	void Start()
 	{
+	
+
 		transform.position = RoomPosition.Vector3(Position);
 		SetWalls();
 
@@ -119,7 +124,7 @@ public class Room : MonoBehaviour
 
 	public void OnDestroy()
 	{
-		GameLogic.Rooms.Remove(this);
+		GameLogic.RemoveRoom(Position);
 	}
 
 	void Update()

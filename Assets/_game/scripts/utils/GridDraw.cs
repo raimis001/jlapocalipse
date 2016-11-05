@@ -73,7 +73,7 @@ public class GridDraw : MonoBehaviour
 	{
 		foreach (GridNode g in path)
 		{
-			Cells[g.x, g.y].GetComponent<SpriteRenderer>().color = Color.green;
+			//Cells[g.x, g.y].GetComponent<SpriteRenderer>().color = Color.green;
 			break;
 		}
 

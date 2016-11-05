@@ -3,19 +3,16 @@ using System.Collections;
 
 public class Gui : MonoBehaviour
 {
-#region static
+	#region static
 	private static Gui _instance;
-	public static Gui Instance
-	{
+	public static Gui Instance {
 		get { return _instance; }
 	}
 
 	private static GameObject _selectedObject;
-	public static GameObject SelectedObject
-	{
+	public static GameObject SelectedObject {
 		get { return _selectedObject; }
-		set
-		{
+		set {
 			if (_selectedObject == value)
 			{
 				Debug.Log("Select same object");
@@ -45,9 +42,9 @@ public class Gui : MonoBehaviour
 			}
 		}
 	}
-#endregion
+	#endregion
 
-	[Header("Object menu")] 
+	[Header("Object menu")]
 	public GameObject MainMenu;
 	public GameObject MenuDrone;
 
@@ -66,6 +63,7 @@ public class Gui : MonoBehaviour
 		Debug.Log("Button: " + tag);
 		if (SelectedObject)
 		{
+			Debug.Log("Selected:" + SelectedObject.name);
 			SelectedObject.GetComponent<CanvasObject>().ButtonClick(tag);
 		}
 	}
@@ -87,7 +85,7 @@ public class Gui : MonoBehaviour
 	{
 		if (!_instance) return;
 		if (_instance.MainMenu) _instance.MainMenu.SetActive(true);
-	
+
 		//TODO: cloase all menu
 		CloseAllMenu();
 
@@ -97,6 +95,16 @@ public class Gui : MonoBehaviour
 				if (_instance.MenuDrone) _instance.MenuDrone.SetActive(true);
 				break;
 		}
+	}
+	public static void StartBuildRoom(Room room)
+	{
+		if (!_instance || !SelectedObject)
+		{
+			return;
+		}
+
+		Debug.Log("Selected:" + SelectedObject.name);
+		SelectedObject.GetComponent<CanvasObject>().BuildRoom(room);
 	}
 
 }

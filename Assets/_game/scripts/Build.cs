@@ -49,7 +49,8 @@ public class Build : MonoBehaviour
 
 	void OnMouseUp()
 	{
-		GameLogic.CreateRoom(Position);
+		Room room = GameLogic.CreateRoom(Position);
 		Clear();
+		Gui.StartBuildRoom(room);
 	}
 }

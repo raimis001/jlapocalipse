@@ -2,10 +2,10 @@
 
 public class InventoryItem
 {
-	public int parentId;
+	public Inventory parent;
 	public ItemKind item;
 	public int count;
-
+	public RoomPosition position;
 }
 
 public class Inventory
@@ -59,7 +59,7 @@ public class Inventory
 			return null;
 		}
 
-		InventoryItem inve = new InventoryItem() {parentId = ID, item = item, count = 1};
+		InventoryItem inve = new InventoryItem() {parent = this, item = item, count = 1};
 		if (Items.ContainsKey(i))
 		{
 			Items[i] = inve;
@@ -71,6 +71,20 @@ public class Inventory
 		return inve;
 	}
 
+	public bool AddItem(ItemMain item)
+	{
+		if (item.Inventory != null)
+		{
+			AddItem(item.Inventory);
+		}
+		else
+		{
+			item.Inventory = CreateItem(item.ItemKind);
+		}
+		
+		return true;
+	}
+	
 	public bool AddItem(InventoryItem item)
 	{
 		int i = FreeIndex();
@@ -78,15 +92,11 @@ public class Inventory
 		{
 			return false;
 		}
-
-		Inventory inve = null;
-		InventoryList.TryGetValue(item.parentId, out inve);
-		if (inve != null)
+		if (item.parent != null)
 		{
-			inve.RemoveItem(item);
+			item.parent.RemoveItem(item);
 		}
-
-		item.parentId = ID;
+		item.parent = this;
 
 		if (Items.ContainsKey(i))
 		{

@@ -31,7 +31,10 @@ public class Drone : MonoBehaviour
 			DoCharge = false;
 		}
 
-		EnergyProgress.Value = Energy;
+		if (EnergyProgress)
+		{
+			EnergyProgress.Value = Energy;
+		}
 	}
 
 	void OnInventoryChange()

@@ -50,7 +50,7 @@ public class HexaTile : MonoBehaviour
 
 	public void OnMouseOver()
 	{
-		Debug.Log("Mouse over:" + _position);
+		//Debug.Log("Mouse over:" + _position);
 		if (HexaMap.Instance.Line.draw)
 		{
 			if (!HexaMap.LastTile)
@@ -73,7 +73,7 @@ public class HexaTile : MonoBehaviour
 
 	public void OnMouseDrag()
 	{
-		Debug.Log("Mouse dragg");
+		//Debug.Log("Mouse dragg");
 
 	}
 

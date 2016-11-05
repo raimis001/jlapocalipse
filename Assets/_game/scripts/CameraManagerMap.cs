@@ -58,7 +58,7 @@ public class CameraManagerMap : MonoBehaviour
 	private void MoveMe(float x, float y)
 	{
 		Vector3 _moveVector = new Vector3(x*horizontalScrollSpeed, 0, y*verticalScrollSpeed) * Time.deltaTime;
-		Debug.Log(_moveVector);
+		//Debug.Log(_moveVector);
 		//transform.Translate(_moveVector);
 
 		transform.localPosition = transform.localPosition + _moveVector;

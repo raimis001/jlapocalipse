@@ -26,9 +26,13 @@ public class ItemMain : MonoBehaviour
 
 	internal bool Enabled = true;
 
+	internal InventoryItem Inventory;
+
+	Vector3 _resetPosition;
+
 	public void ResetPosition()
 	{
-		//transform.localPosition = Inventory.Position();
+		transform.localPosition = _resetPosition;
 	}
 
 	public void Update()
@@ -39,27 +43,30 @@ public class ItemMain : MonoBehaviour
 	public void OnMouseDown()
 	{
 		Debug.Log(" mouse down Item:" + ItemKind);
+		_resetPosition = transform.position;
 	}
 
 	public void OnMouseUp()
 	{
 		if (!Enabled) return;
 		Debug.Log(" mouse up Item:" + ItemKind);
-		//Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		//RaycastHit[] hits = Physics.RaycastAll(ray);
-		/*
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit[] hits = Physics.RaycastAll(ray);
+
 		foreach (RaycastHit hit in hits)
 		{
-			if (hit.collider.gameObject.GetComponent<Inventory>())
+			//Debug.Log(hit.collider.name);
+			InventoryShelf shelf = hit.collider.gameObject.GetComponentInParent<InventoryShelf>();
+			if (shelf)
 			{
-				//Debug.Log("Hit inventory");
-				if (hit.collider.gameObject.GetComponent<Inventory>().AddItem(this))
+				Debug.Log("Hit inventory");
+				if (shelf.AddItem(this))
 				{
 					return;
 				}
 			}
 		}
-		*/
+
 		ResetPosition();
 	}
 
@@ -71,26 +78,27 @@ public class ItemMain : MonoBehaviour
 		float distance_to_screen = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
 		float z = transform.position.z;
 
-		/*
+		
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit[] hits = Physics.RaycastAll(ray);
 		foreach (RaycastHit hit in hits)
 		{
-			if (hit.collider.gameObject.GetComponent<Inventory>())
+			InventoryShelf shelf = hit.collider.gameObject.GetComponentInParent<InventoryShelf>();
+			if (shelf)
 			{
-				//Debug.Log("Hit room device");
-				z = hit.point.z - 0.25f;
+				Debug.Log("Hit invenrtory");
+				z = shelf.transform.position.z - 0.0f;
 				distance_to_screen = Camera.main.WorldToScreenPoint(hit.point).z;
 				break;
 			}
 		}
-		*/
+		
 		Vector3 pos_move = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
 		transform.position = new Vector3(pos_move.x - 0.25f, pos_move.y - 0.0f, z);
 
 	}
 
-	public static ItemMain Create(ItemKind kind)
+	public static ItemMain Create(ItemKind kind, Vector3 position = new Vector3())
 	{
 		if (!GameLogic.Instance) return null;
 		int i = (int) kind;
@@ -99,6 +107,7 @@ public class ItemMain : MonoBehaviour
 		{
 
 			GameObject obj = Instantiate(GameLogic.Instance.Items[i]);
+			obj.transform.position = position;
 			return obj.GetComponent<ItemMain>();
 		}
 		return null;

@@ -3,18 +3,24 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
 
+public enum MapKinds
+{
+	Cave,
+	Top,
+}
+
 public class GameLogic : MonoBehaviour
 {
 
 	private static GameLogic _instance;
 	public static GameLogic Instance { get { return _instance; } }
 
-	public static List<Room> Rooms = new List<Room>();
+	private static Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
 	public static CavePathfinder Pathfinder = new CavePathfinder();
 
-	public static void CreateRoom(RoomPosition pos)
+	public static Room CreateRoom(RoomPosition pos)
 	{
-		Room room = Room.CreateRoom(pos, RoomType.SERVICE);
+		Room room = Room.CreateRoom(pos, RoomType.NONE);
 
 		int weight = 0;
 		if (pos.HasLeft())
@@ -30,9 +36,35 @@ public class GameLogic : MonoBehaviour
 
 		room.Weight = weight;
 
-		Pathfinder.Prepare();
+		return room;
 	}
-
+	public static void AddRoom(RoomPosition pos, Room room)
+	{
+		string key = room.Position.hash;
+		if (Rooms.ContainsKey(key))
+		{
+			Rooms[key] = room;
+			return;
+		}
+		Rooms.Add(key, room);
+	}
+	public static void RemoveRoom(RoomPosition position)
+	{
+		string key = position.hash;
+		if (Rooms.ContainsKey(key))
+		{
+			Rooms.Remove(key);
+		}
+	}
+	public static Room GetRoom(int x, int y)
+	{
+		string key = RoomPosition.Hash(x, y);
+		if (Rooms.ContainsKey(key))
+		{
+			return Rooms[key];
+		}
+		return null;
+	}
 	public delegate void RoomSelect(Room room);
 	public static event RoomSelect OnRoomSelect;
 
@@ -89,6 +121,10 @@ public class GameLogic : MonoBehaviour
 	public Text OxigeGen;
 	public GridDraw PathDrawer;
 
+	[Header("Maps")]
+	public GameObject TopMap;
+	public GameObject CaveMap;
+	internal MapKinds MapKind;
 
 	void Awake()
 	{
@@ -192,6 +228,7 @@ public class GameLogic : MonoBehaviour
 		Build.Clear();
 		foreach (Room room in rooms)
 		{
+			if (room.Position.y == 0) continue;
 			//TODO: look left and right
 			string test = RoomPosition.Hash(room.Position.x - 1, room.Position.y);
 			if (!roomList.Contains(test))
@@ -203,9 +240,23 @@ public class GameLogic : MonoBehaviour
 			{
 				Build.Create(room.Position.x + 1, room.Position.y);
 			}
+			
 		}
 
+		return;
 
+
+	}
+
+	public static void SwithMap()
+	{
+		if (!_instance)
+		{
+			return;
+		}
+		_instance.MapKind = _instance.MapKind == MapKinds.Top ? MapKinds.Cave : MapKinds.Top;
+		_instance.TopMap.SetActive(_instance.MapKind == MapKinds.Top);
+		_instance.CaveMap.SetActive(_instance.MapKind == MapKinds.Cave);
 	}
 
 #region Prefabs

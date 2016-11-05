@@ -28,16 +28,7 @@ public class CavePathfinder
 	{
 		int rx = x + TopLeft.x;
 		int ry = y / 2;
-
-		foreach (Room room in GameLogic.Rooms) 
-		{
-			if (room.Position.x == rx && room.Position.y == ry) {
-				//Debug.Log("check at:" + rx + ":" + ry + " true");
-				return room;
-			}
-		}
-		//Debug.Log("check at:" + rx + ":" + ry + " false");
-		return null;
+		return GameLogic.GetRoom(rx, ry);
 	}
 
 	public CaveNode GetNode(int x, int y) 
@@ -51,8 +42,8 @@ public class CavePathfinder
 
 		TopLeft = new IntVector(int.MaxValue, int.MaxValue);
 		BottomRight = new IntVector(-int.MaxValue, -int.MaxValue);
-
-		foreach (Room room in GameLogic.Rooms)
+		Room[] rooms = GameObject.FindObjectsOfType<Room>();
+		foreach (Room room in rooms)
 		{
 			if (room.Position.x < TopLeft.x) TopLeft.x = room.Position.x;
 			if (room.Position.y < TopLeft.y) TopLeft.y = room.Position.y;
@@ -65,7 +56,7 @@ public class CavePathfinder
 		height = (BottomRight.y - TopLeft.y) * 2 + 2;
 
 		Map = new CaveNode[width, height];
-
+		Debug.Log("Prepare map:" + width + ":" + height);
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)
 			{
@@ -90,6 +81,7 @@ public class CavePathfinder
 
 	public List<GridNode> FindPath(RoomPosition start, RoomPosition end)
 	{
+		Prepare();
 		int startX = start.x - TopLeft.x;
 		int startY = start.y * 2;
 

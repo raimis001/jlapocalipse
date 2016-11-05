@@ -18,6 +18,7 @@ public class Character : MonoBehaviour
 	private bool _break = false;
 
 	private int _currentWayPoint;
+	private Room _currentRoom;
 
 	//public Inventory Inventory;
 
@@ -35,6 +36,9 @@ public class Character : MonoBehaviour
 		Body.localPosition = Path.WaypointList[_currentWayPoint].transform.localPosition;
 		Body.eulerAngles = Path.WaypointList[_currentWayPoint].transform.eulerAngles;
 
+
+		_currentRoom = GameLogic.GetRoom(0, 0);
+		transform.SetParent(_currentRoom.transform);
 	}
 
 	// Update is called once per frame
@@ -47,6 +51,17 @@ public class Character : MonoBehaviour
 			{
 				//Destroy(item.gameObject);
 			}
+		}
+	}
+
+	public void GotoSelected()
+	{
+		if (GameLogic.SelectedRoom != null)
+		{
+			//transform.SetParent(GameLogic.SelectedRoom.transform);
+			//transform.localPosition = Vector3.zero;
+			//_currentRoom = GameLogic.SelectedRoom;
+			StartCoroutine(Move(GameLogic.SelectedRoom));
 		}
 	}
 
@@ -114,6 +129,48 @@ public class Character : MonoBehaviour
 		_moving = false;
 	}
 
+	IEnumerator MoveToRoom(Room room)
+	{
+		yield return Move(room);
+	}
+	IEnumerator Move(Room room)
+	{
+		if (_currentRoom.Position.x < room.Position.x)
+		{
+			//Goto right
+			if (_currentWayPoint !=2)
+			{
+				_currentWayPoint = 2;
+				yield return Move(Path.WaypointList[_currentWayPoint]);
+			}
+			if (_currentWayPoint != 4)
+			{
+				_currentWayPoint = 4;
+				yield return Move(Path.WaypointList[_currentWayPoint]);
+				_currentWayPoint = 0;
+			}
+		}
+		else
+		{
+			//Goto left
+			if (_currentWayPoint != 0)
+			{
+				_currentWayPoint = 0;
+				yield return Move(Path.WaypointList[_currentWayPoint]);
+			}
+			if (_currentWayPoint != 5)
+			{
+				_currentWayPoint = 5;
+				yield return Move(Path.WaypointList[_currentWayPoint]);
+				_currentWayPoint = 2;
+			}
+
+		}
+		_currentRoom = room;
+		transform.SetParent(_currentRoom.transform);
+		transform.localPosition = Vector3.zero;
+		Body.transform.localPosition = Path.WaypointList[_currentWayPoint].transform.localPosition;
+	}
 	IEnumerator Rotate(Quaternion rotationTo)
 	{
 		float maxTime = 0.3f;

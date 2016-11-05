@@ -54,6 +54,19 @@ public class DroneMover : MonoBehaviour
 		StartCoroutine(MoveByPath(path));
 	}
 
+	public void MoveToBuild(Build build)
+	{
+
+		List<GridNode> path = GameLogic.Pathfinder.FindPath(CurrentRoom.Position, build.Position);
+		if (path.Count < 1)
+		{
+			return;
+		}
+		GameLogic.Instance.PathDrawer.FillPath(path);
+
+		StartCoroutine(MoveByPath(path));
+	}
+
 	public void MoveToCharger(DeviceCharger charger)
 	{
 		StartCoroutine(IEMoveToCharger(charger));

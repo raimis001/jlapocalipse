@@ -25,13 +25,7 @@ public class RoomDevice : MonoBehaviour
 
 	private bool _working;
 	public bool Working = true;
-	private bool working 
-	{
-		set 
-		{
-			LightsOn = value;
-		}
-	}
+
 
 	public BarValues Values;
 
@@ -43,9 +37,13 @@ public class RoomDevice : MonoBehaviour
 		}
 	}
 
+	internal Inventory Inventory;
+
 	protected virtual void Start()
 	{
 		//if (Inventory) Inventory.OnChange = InventoryChanged;
+
+		Inventory = new Inventory();
 
 		Room room = GetComponentInParent<Room>();
 		if (room)
@@ -59,7 +57,7 @@ public class RoomDevice : MonoBehaviour
 		if (Working != _working) 
 		{
 			_working = Working;
-			working = Working; 	
+			LightsOn = Working; 	
 		}
 
 		if (!Position.Equals(_position)) 
